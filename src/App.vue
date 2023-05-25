@@ -1,20 +1,29 @@
 <template>
-  <div id="app">
-    <nav>
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </nav>
+  <v-app>
+  
+    <v-app-bar>
+      <router-link to="/">InicioSesion</router-link> |
+      <router-link to="/adminGanado">Administración de Hato</router-link> |
+      <router-link to="/adminCria">Administración de Cria</router-link>  |
+      <router-link to="/adminLote">Administración de Lote</router-link>  |
+      <router-link to="/adminVeterinario">Administración de Visitas</router-link>  
+    </v-app-bar>
     <router-view/>
-  </div>
+
+</v-app>
 </template>
+
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color:#0F3D59;
+    position: fixed;
+    top: 0;
+    width: 100%;
 }
 
 nav {
@@ -23,10 +32,10 @@ nav {
 
 nav a {
   font-weight: bold;
-  color: #2c3e50;
+  color: #f2f2f2;
 }
 
 nav a.router-link-exact-active {
-  color: #42b983;
+  color: #8bd194;
 }
 </style>
