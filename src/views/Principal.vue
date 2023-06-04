@@ -8,12 +8,12 @@
             <adminGanado :userJson="userJson"></adminGanado>
         </v-tab-item>
 
-        <v-tab href="#cria">
+        <!--<v-tab href="#cria">
             <span>Administración de Cria</span> 
         </v-tab>
         <v-tab-item value="cria">
             <adminCria :userJson="userJson"></adminCria>
-        </v-tab-item>
+        </v-tab-item>-->
 
         <v-tab href="#lote">
             <span >Administración de Lote</span>  
@@ -22,30 +22,39 @@
             <adminLote :userJson="userJson"></adminLote>
         </v-tab-item>
 
-        <v-tab href="#visita">
+        <v-tab href="#traspaso">
+            <span >Administración de Traspaso</span>  
+        </v-tab>
+        <v-tab-item value="traspaso">
+            <adminTraspaso :userJson="userJson"></adminTraspaso>
+        </v-tab-item>
+        
+        <!--<v-tab href="#visita">
             <span >Administración de Visitas</span>  
         </v-tab>
         <v-tab-item value="visita">
             <adminVeterinario :userJson="userJson"></adminVeterinario>
-        </v-tab-item>
+        </v-tab-item>-->
     </v-tabs>   
     <router-view/>
     </div>
 </template>
 
 <script>
-    import adminCria from '@/components/adminCria.vue'
+    //import adminCria from '@/components/adminCria.vue'
     import adminGanado from '@/components/adminGanado.vue'
     import adminLote from '@/components/adminLote.vue'
-    import adminVeterinario from '@/components/adminVeterinario.vue'
+    import adminTraspaso from '@/components/adminTraspaso.vue'
+    //import adminVeterinario from '@/components/adminVeterinario.vue'
 
     export default {
         name: "principal",
         components:{
-            adminCria,
+            //adminCria,
             adminGanado,
             adminLote,
-            adminVeterinario
+            adminTraspaso,
+            //adminVeterinario
         },
         props:['user'],
         data(){

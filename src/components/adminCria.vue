@@ -99,7 +99,7 @@
             </v-card-text>
           <v-card-actions>
           <v-spacer></v-spacer> 
-            <v-btn elevation="0" dark rounded width="120" class="green px13 font-weight-regular pr-4" small @click="saveItem()">
+            <v-btn elevation="0" dark rounded width="120" class="green px13 font-weight-regular pr-4" small @click="onClickNew()">
               <v-icon left> mdi-check</v-icon>Guardar
             </v-btn>
             <v-btn elevation="0" rounded text width="100" class="red--text px13 font-weight-bold" small @click="cerrarVentanaNuevo()">
@@ -115,29 +115,29 @@
         <v-card>
           <v-card-title>Editar Cria</v-card-title>
             <v-card-text>
-              <v-form ref="formCriaEditar" v-model="valid">
+              <v-form ref="formCriaEditar" v-model="valid" lazy-validation>
                 <v-row align="center" justify="start">
                   <v-col cols="12" md="6" sm="4">
-                  <v-select :items="hato" label="Número de Arete" item-value="id" item-text="numArete" v-model="criaAttributes.numArete" required></v-select>
+                  <v-select :items="hato" label="Número de Arete" item-value="id" item-text="numArete" v-model="criaAttributes.numArete" :rules="required"></v-select>
                 </v-col> 
                   <v-col cols="12" md="6" sm="4">
-                    <v-select :items="sexoItems" label="Sexo" :item-value="criaAttributes.sexo" :item-text="criaAttributes.sexo" v-model="criaAttributes.sexo" required></v-select>
+                    <v-select :items="sexoItems" label="Sexo" :item-value="criaAttributes.sexo" :item-text="criaAttributes.sexo" v-model="criaAttributes.sexo" :rules="required"></v-select>
                   </v-col>
                   <v-col cols="12" md="6" sm="4"> 
                     <v-flex >
                       <v-menu v-model="menu2" :close-on-content-click="false" :nudge-right="40" lazy transition="scale-transition" offset-y full-width min-width="290px">
                         <template v-slot:activator="{ on }">
-                          <v-text-field v-model="date" label="Fecha de Nacimiento" readonly v-on="on" required></v-text-field>
+                          <v-text-field v-model="date" label="Fecha de Nacimiento" readonly v-on="on" :rules="required"></v-text-field>
                         </template>
                         <v-date-picker v-model="date" @input="menu2 = false"></v-date-picker>
                       </v-menu>
                     </v-flex>
                   </v-col> 
                   <v-col cols="12" md="6" sm="4">  
-                    <v-text-field v-model="criaAttributes.observaciones" label="Observaciones"  required></v-text-field>
+                    <v-text-field v-model="criaAttributes.observaciones" label="Observaciones"  :rules="required"></v-text-field>
                   </v-col> 
                   <v-col cols="12" md="6" sm="4">
-                    <v-select :items="raza" label="Raza" item-value="id" item-text="nombre"  v-model="criaAttributes.idRaza" required></v-select>
+                    <v-select :items="raza" label="Raza" item-value="id" item-text="nombre"  v-model="criaAttributes.idRaza" :rules="required"></v-select>
                   </v-col> 
                 </v-row>
               </v-form>
@@ -172,6 +172,13 @@
         </v-card>
       </v-dialog>
       <!--FIN DIALOGO ELIMINAR-->
+      <!--<v-snackbar :timeout="2000" color="blue-grey" rounded="pill">
+      <template v-slot:activator="{ props }">
+        <v-btn rounded="pill" color="blue-grey" class="ma-2" v-bind="props">open</v-btn>
+      </template>
+
+      Snackbar with <strong>rounded="pill"</strong>.
+    </v-snackbar>-->
     </v-card>
   </v-container>
 </template>
@@ -238,11 +245,12 @@
       };
     },
     async created(){
-      //Get Data of Cria
+      this.getCria();
+      /*Get Data of Cria
       await axios.get("http://localhost:8084/GanaderiaWS/ws/cria/getAllCria/")
       .then(response=>{
       console.log(response)
-      for(let i in response.data){this.cria.push(response.data[i]) }}).catch(e => console.log(e));
+      for(let i in response.data){this.cria.push(response.data[i]) }}).catch(e => console.log(e));*/
       //Get Data of Hato
       await axios.get("http://localhost:8084/GanaderiaWS/ws/hato/getAllHatoActivo/")
       .then(response=>{
@@ -259,8 +267,27 @@
     computed:{},
     watch:{},
     methods:{
-      saveItem(item){
-        this.dialogNuevo=true;
+      editItem(item){
+        this.dialogEditar=true,
+        this.criaAttributes={...item},
+        console.log(this.hato.numArete)
+      },
+      deleteItem(item){
+        this.dialogEliminar=true,
+        this.criaAttributes={...item},
+        console.log(this.criaAttributes)
+      },
+      onClickBuscar(){
+
+      },
+      onClickLimpiar(){
+        this.$refs.formBusqueda.reset()
+      },
+      onclickNuevoCria(){
+        this.dialogNuevo=true
+      },
+      onClickNew(){
+        
         if(this.$refs.formCriaNuevo.validate()){
           const postData = new URLSearchParams();
           postData.append('numArete', this.criaAttributes.numArete);
@@ -274,57 +301,44 @@
           console.log(response.data.mensaje);
           this.$refs.formCriaNuevo.reset(),
           this.dialogNuevo=false;
-          this.tablaCria();
+          this.cria = [];
+          this.getCria();
           }).catch(rr => console.log(rr));   
         }
-
-        /*console.log(this.criaAttributes.numArete)
-        console.log(this.criaAttributes.sexo)
-        console.log(this.date)
-        console.log(this.criaAttributes.idRaza)
-        console.log(this.criaAttributes.observaciones)
-        console.log(this.userJson.idUsuario)*/
+      },
+      onClickEdit(item){
+        if(this.$refs.formCriaEditar.validate()){
+          const postData = new URLSearchParams();
+          postData.append('idCria', this.criaAttributes.idCria);
+          postData.append('numArete', this.criaAttributes.numArete);
+          postData.append('sexo', this.criaAttributes.sexo);
+          postData.append('fechaNac', this.date);
+          postData.append('idRaza', this.criaAttributes.idRaza);
+          postData.append('observaciones', this.criaAttributes.observaciones);
+          postData.append('idUsuario', this.userJson.idUsuario);
+          axios.post("http://localhost:8084/GanaderiaWS/ws/cria/actualizarCria/",postData)
+          .then(response=>{ 
+          console.log(response.data.mensaje);
+          this.$refs.formCriaEditar.reset(),
+          this.dialogEditar=false;
+          this.created()
+          }).catch(rr => console.log(rr));   
+        }
        
- 
-      },
-      editItem(item){
-        this.dialogEditar=true,
-        this.criaAttributes={...item},
-        console.log(this.hato.numArete)
-      },
-      deleteItem(item){
-        this.dialogEliminar=true,
-        this.criaAttributes={...item},
-        console.log(this.criaAttributes)
-      },
-      saveCria(){
-
-      },
-      onClickBuscar(){
-
-      },
-      onClickLimpiar(){
-        this.$refs.formBusqueda.reset()
-      },
-      onclickNuevoCria(){
-        this.dialogNuevo=true
-      },
-      onClickEdit(){
-        //console.log(this.ganadoAttributes.raza.id)
-        //const postData = new URLSearchParams();
-        //postData.append('usuario', this.usuario);
-        //postData.append('password', this.password);
-        //axios.post("http://localhost:8084/GanaderiaWS/ws/hato/actualizarHato/",postData)
-        //then(response=>{
-        //console.log(response.data.mensaje)
-        // console.log("hola")
-        // })
-        //.catch(rr => console.log(rr));
-        this.dialogEditar=false
-        console.log(this.criaAttributes)
       },
       onClickDelet(){
-        
+        const postData = new URLSearchParams();
+        postData.append('idCria', this.criaAttributes.idCria);
+        axios.post("http://localhost:8084/GanaderiaWS/ws/cria/eliminarCria/",postData)
+          .then(response=>{ 
+          console.log(response.data.mensaje);
+          
+          this.dialogEliminar=false;
+          this.cria.splice();
+      
+          
+          }).catch(rr => console.log(rr));  
+          console.log(this.criaAttributes.idCria);
       },
       cerrarVentanaNuevo(){
         this.$refs.formCriaNuevo.reset(),
@@ -337,7 +351,7 @@
       cerrarVentanaDelete(){
         this.dialogEliminar=false
       },
-      async tablaCria(){
+      async getCria(){
          //Get Data of Cria
         await axios.get("http://localhost:8084/GanaderiaWS/ws/cria/getAllCria/")
         .then(response=>{

@@ -37,7 +37,7 @@
       <!--TABLA-->
       <v-row>
         <v-col cols="12">
-          <v-data-table :headers="headers" :items="ganado" :items-per-page="5" class="ml-15 mr-15" dense>
+          <v-data-table :headers="headers" :items="ganado" :items-per-page="5" item-key="numArete" single-select @click:row="onClickFila" class="ml-15 mr-15" dense>
             <template v-slot:[`item.actions`]="{ item }">
               <v-row style="width: 8vw;">
                 <v-tooltip bottom>
@@ -69,32 +69,32 @@
         <v-card>
           <v-card-title>Nuevo Hato</v-card-title>
           <v-card-text>
-            <v-form ref="formGanadoNuevo" v-model="valid">
+            <v-form ref="formGanadoNuevo" v-model="valid" lazy-validation>
               <v-row align="center" justify="start">
                 <v-col  v-for=" attributes in attibutesNames" cols="12" md="6" sm="4">  
-                  <v-text-field v-model="ganadoAttributes[attributes]" :label=attributes required></v-text-field>
+                  <v-text-field v-model="ganadoAttributes[attributes]" :label=attributes :rules="required"></v-text-field>
                 </v-col>  
                 <v-col cols="12" md="6" sm="4">
-                  <v-select  :items="raza" label="Razas" item-value="id" item-text="nombre" v-model="ganadoAttributes.raza" required></v-select>
+                  <v-select  :items="raza" label="Razas" item-value="id" item-text="nombre" v-model="ganadoAttributes.raza" :rules="required"></v-select>
                 </v-col> 
                 <v-col cols="12" md="6" sm="4">
-                  <v-select :items="sexoItems" label="Sexo" :item-value="ganadoAttributes.sexo" :item-text="ganadoAttributes.sexo" v-model="ganadoAttributes.sexo" required></v-select>
+                  <v-select :items="sexoItems" label="Sexo" :item-value="ganadoAttributes.sexo" :item-text="ganadoAttributes.sexo" v-model="ganadoAttributes.sexo" :rules="required"></v-select>
                 </v-col>
                 <v-col cols="12" md="6" sm="4">
-                  <v-select :items="rancho" label="Ranchos" item-value="id" item-text="nombre" v-model="ganadoAttributes.rancho" required></v-select>
+                  <v-select :items="rancho" label="Ranchos" item-value="id" item-text="nombre" v-model="ganadoAttributes.rancho" :rules="required"></v-select>
                 </v-col> 
                 <v-col cols="12" md="6" sm="4">
-                  <v-select :items="lote" label="Lotes" item-value="id" item-text="nombreLote" v-model="ganadoAttributes.lote" required></v-select>
+                  <v-select :items="lote" label="Lotes" item-value="id" item-text="nombreLote" v-model="ganadoAttributes.lote" :rules="required"></v-select>
                 </v-col> 
                 <v-col cols="12" md="6" sm="4">
-                  <v-select :items="tipoGanado" label="Tipo de ganado" :item-value="ganadoAttributes.tipoGanado" :item-text="ganadoAttributes.tipoGanado" v-model="ganadoAttributes.tipoGanado" required></v-select>
+                  <v-select :items="tipoGanado" label="Tipo de ganado" :item-value="ganadoAttributes.tipoGanado" :item-text="ganadoAttributes.tipoGanado" v-model="ganadoAttributes.tipoGanado" :rules="required"></v-select>
                 </v-col> 
               </v-row>
             </v-form>
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer> 
-            <v-btn elevation="0" dark rounded width="120" class="green px13 font-weight-regular pr-4" small @click="saveItem()">
+            <v-btn elevation="0" dark rounded width="120" class="green px13 font-weight-regular pr-4" small @click="onClickNew()">
               <v-icon left> mdi-check</v-icon>Guardar
             </v-btn>
             <v-btn elevation="0" rounded text width="100" class="red--text px13 font-weight-bold" small @click="cerrarVentanaNuevo()">
@@ -110,32 +110,32 @@
         <v-card>
           <v-card-title>Ganado</v-card-title>
           <v-card-text>
-            <v-form ref="formGanado" v-model="valid">
+            <v-form ref="formGanado" v-model="valid" lazy-validation>
               <v-row align="center" justify="start">
                 <v-col  v-for=" attributes in attibutesNames" cols="12" md="6" sm="4">  
-                  <v-text-field v-model="ganadoAttributes[attributes]" :label=attributes required></v-text-field>
+                  <v-text-field v-model="ganadoAttributes[attributes]" :label=attributes :rules="required" ></v-text-field>
                 </v-col>  
                 <v-col cols="12" md="6" sm="4">
-                  <v-select  :items="raza" label="Razas" item-value="id" item-text="nombre" v-model="ganadoAttributes.idRaza" required></v-select>
+                  <v-select  :items="raza" label="Razas" item-value="id" item-text="nombre" v-model="ganadoAttributes.idRaza" :rules="required"></v-select>
                 </v-col> 
                 <v-col cols="12" md="6" sm="4">
-                  <v-select :items="sexoItems" label="Sexo" :item-value="ganadoAttributes.sexo" :item-text="ganadoAttributes.sexo" v-model="ganadoAttributes.sexo" required></v-select>
+                  <v-select :items="sexoItems" label="Sexo" :item-value="ganadoAttributes.sexo" :item-text="ganadoAttributes.sexo" v-model="ganadoAttributes.sexo" :rules="required"></v-select>
                 </v-col>
                 <v-col cols="12" md="6" sm="4">
-                  <v-select :items="rancho" label="Ranchos" item-value="id" item-text="nombre" v-model="ganadoAttributes.idRancho" required></v-select>
+                  <v-select :items="rancho" label="Ranchos" item-value="id" item-text="nombre" v-model="ganadoAttributes.idRancho" :rules="required"></v-select>
                 </v-col> 
                 <v-col cols="12" md="6" sm="4">
-                  <v-select :items="lote" label="Lotes" item-value="id" item-text="nombreLote" v-model="ganadoAttributes.idLote" required></v-select>
+                  <v-select :items="lote" label="Lotes" item-value="id" item-text="nombreLote" v-model="ganadoAttributes.idLote" :rules="required"></v-select>
                 </v-col> 
                 <v-col cols="12" md="6" sm="4">
-                  <v-select :items="tipoGanado" label="Tipo de ganado" :item-value="ganadoAttributes.tipoGanado" :item-text="ganadoAttributes.tipoGanado" v-model="ganadoAttributes.tipoGanado" required></v-select>
+                  <v-select :items="tipoGanado" label="Tipo de ganado" :item-value="ganadoAttributes.tipoGanado" :item-text="ganadoAttributes.tipoGanado" v-model="ganadoAttributes.tipoGanado" :rules="required"></v-select>
                 </v-col> 
               </v-row>
             </v-form>
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer> 
-            <v-btn elevation="0" dark rounded width="120" class="green px13 font-weight-regular pr-4" small @click="saveEdit()">
+            <v-btn elevation="0" dark rounded width="120" class="green px13 font-weight-regular pr-4" small @click="onClickEdit()">
               <v-icon left> mdi-check</v-icon>Guardar
             </v-btn>
             <v-btn elevation="0" rounded text width="100" class="red--text px13 font-weight-bold" small @click="cerrarVentana()">
@@ -151,20 +151,20 @@
         <v-card>
           <v-card-title>Ganado</v-card-title>
           <v-card-text>
-            <v-form ref="formGanadoEliminar" v-model="validEliminar">
+            <v-form ref="formGanadoEliminar" v-model="validEliminar" lazy-validation>
               <v-row align="center" justify="start">
                 <v-col  cols="12" md="6" sm="4">  
-                  <v-text-field v-model="ganadoAttributes.numArete" label="Número de Arete" required></v-text-field>
+                  <v-text-field v-model="ganadoAttributes.numArete" label="Número de Arete" :rules="required"></v-text-field>
                 </v-col>  
                 <v-col  cols="12" md="6" sm="4">  
-                  <v-text-field v-model="ganadoAttributes.motivoDeBaja" label="Motivo de baja" required></v-text-field>
+                  <v-text-field v-model="ganadoAttributes.motivoDeBaja" label="Motivo de baja" :rules="required"></v-text-field>
                 </v-col>  
               </v-row>
             </v-form>
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer> 
-            <v-btn elevation="0" dark rounded width="120" class="green px13 font-weight-regular pr-4" small @click="saveDelet()">
+            <v-btn elevation="0" dark rounded width="120" class="green px13 font-weight-regular pr-4" small @click="onClickDelet()">
               <v-icon left> mdi-check</v-icon>Guardar
             </v-btn>
             <v-btn elevation="0" rounded text width="100" class="red--text px13 font-weight-bold" small @click="cerrarVentanaDelete()">
@@ -174,12 +174,29 @@
         </v-card>
       </v-dialog>
       <!--FIN DIALOGO ELIMINAR-->
+      <v-tabs v-model="tab" class="tabs" fixed-tabs bg-color="indigo-darken-2">
+        <v-tab href="#cria">
+            <span>Administración de Cria</span> 
+        </v-tab>
+        <v-tab-item value="cria">
+            <adminCria :userJson="userJson"></adminCria>
+        </v-tab-item>
+        <v-tab href="#visita">
+            <span >Administración de Visitas</span>  
+        </v-tab>
+        <v-tab-item value="visita">
+            <adminVeterinario :userJson="userJson"></adminVeterinario>
+        </v-tab-item>
+     
+      </v-tabs>
     </v-card>
  </v-container>
 </template>
     
 <script>
-  import axios, { Axios } from 'axios'   
+  import axios, { Axios } from 'axios' 
+  import adminCria from '@/components/adminCria.vue'
+  import adminVeterinario from '@/components/adminVeterinario.vue'  
   const config = {
     headers: {
       'Content-type': 'application/json; charset=utf-8',
@@ -193,7 +210,10 @@
   
   export default {
     name: "AdminGanado",
-    components:{},
+    components:{
+      adminVeterinario,
+      adminCria
+    },
     props:['userJson'],
     beforeCreate(
       axios= new Axios
@@ -201,6 +221,8 @@
 
     data(){
       return{ 
+        tab: null,
+        idHatoSelect:null,
         dialogNuevo:false,
         dialogEditar:false,
         dialogEliminar:false,
@@ -224,6 +246,7 @@
           idUsuario:null,
           motivoDeBaja:null,
         },
+        required:[(v) => !!v || "Este campo es requerido"],
        //Variables edit
         headers: [
           { text: 'Número de arete', value: 'numArete', align: 'start', sortable: false, windth:255, },
@@ -252,11 +275,10 @@
       };
     },
     async created(){
-      //Get Data of ganado
-      await axios.get("http://localhost:8084/GanaderiaWS/ws/hato/getAllHato/")
-      .then(response=>{
-      console.log(response)
-      for(let i in response.data){this.ganado.push(response.data[i]) }}).catch(e => console.log(e));
+      if(!this.$session.id() && !this.$session.has("user")){
+            this.$router.push({name:"login"})
+        }
+      this.getHato();
       // Get Raza
       await axios.get("http://localhost:8084/GanaderiaWS/ws/raza/getAllRazaActivo")
       .then(response=>{
@@ -276,17 +298,29 @@
     computed:{},
     watch:{},
     methods:{
-      saveItem(){
-
-},
+      onclickNuevoHato(){
+        this.dialogNuevo=true
+      },
+      deleteItem(item){
+        this.dialogEliminar=true,
+        this.ganadoAttributes={...item}
+      },
       editItem(item){
         this.dialogEditar=true,
         this.ganadoAttributes={...item},
         console.log(this.ganadoAttributes)
       },
-      
-      saveEdit(){
+      onClickNew(){
+        if(this.$refs.formGanadoNuevo.validate()){
+
+        }
+      },      
+      onClickEdit(){
         console.log(this.ganadoAttributes.raza.id)
+        if(this.$refs.formGanado.validate()){
+
+
+        }
             //const postData = new URLSearchParams();
             //postData.append('numArete', this.ganadoAttributes.numArete);
             //postData.append('sexo', this.ganadoAttributes.sexo);
@@ -305,21 +339,31 @@
             //.catch(rr => console.log(rr));
             //this.dialogEditar=false
       },
-      deleteItem(item){
-        this.dialogEliminar=true,
-        this.ganadoAttributes={...item}
-      },
-      saveDelet(){
-
+      onClickDelet(){
+        if(this.$refs.formGanadoEliminar.validate()){
+          const postData = new URLSearchParams();
+          postData.append('numArete', this.ganadoAttributes.numArete);
+          postData.append('motivoDeBaja', this.ganadoAttributes.motivoDeBaja);
+          postData.append('idUsuario', this.userJson.idUsuario);
+          axios.post("http://localhost:8084/GanaderiaWS/ws/hato/eliminarHato/",postData)
+            .then(response=>{ 
+            console.log(response.data.mensaje);
+            
+            this.dialogEliminar=false;
+            
+            }).catch(rr => console.log(rr));  
+        }
+            
       },
       onClickBuscar(){
-        console.log(this.userJson)
+        console.log(this.userJson);
+        this.consultarHato();
+        this.consultarCrias();
+        this.ConsulartVeterinario();
+
       },
       onClickLimpiar(){
         this.$refs.formBusqueda.reset()
-      },
-      onclickNuevoHato(){
-        this.dialogNuevo=true
       },
       cerrarVentanaNuevo(){
         this.dialogNuevo=false
@@ -332,6 +376,23 @@
         this.$refs.formGanadoEliminar.reset(),
         this.dialogEliminar=false
       },
+      async getHato(){
+        //Get Data of ganado
+        await axios.get("http://localhost:8084/GanaderiaWS/ws/hato/getAllHato/")
+        .then(response=>{
+        console.log(response)
+        for(let i in response.data){this.ganado.push(response.data[i]) }}).catch(e => console.log(e));
+      },
+      onClickFila(item,row){
+            console.log(item)
+            console.log(row)
+            row.select(true)
+            this.idHatoSelect=item.numArete
+            this.getInformacionLaboral(this.idHatoSelect)
+        },
+      async getInformacionLaboral(numArete){
+
+      }
     },
   };
 </script>
