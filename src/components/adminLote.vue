@@ -338,6 +338,8 @@ export default {
         } else {
           console.log(response.mensaje);
           this.$refs.formLoteNuevo.reset(), (this.dialogNuevo = false);
+          this.lote=[];
+          this.getLote()
         }
       }
     },
@@ -356,6 +358,8 @@ export default {
         } else {
           console.log(response.mensaje);
           this.$refs.formLote.reset(), (this.dialogEditar = false);
+          this.lote=[];
+          this.getLote()
         }
       }
     },
@@ -368,8 +372,9 @@ export default {
         return;
       } else {
         console.log(response.mensaje);
-
         this.dialogEliminar = false;
+        this.lote=[];
+        this.getLote()
       }
     },
     async onClickBuscar() {

@@ -88,6 +88,27 @@
           </v-data-table>
         </v-col>
       </v-row>
+      <!--TABLA DETALLE-->
+      <v-card-text>
+        <v-card-title>Movimientos de Traspasos</v-card-title>
+      </v-card-text>
+      <v-row>
+        <v-col cols="12">
+          <v-data-table
+            :headers="headersDetalle"
+            :items="traspasoDetalle"
+            :items-per-page="5"
+            class="ml-15 mr-15"
+            dense
+          >
+            <template v-slot:item.loteOriginal="{ item }">
+              <span class="font-weight-bold blue--text"
+                >{{ item.loteOriginal }}
+              </span>
+            </template>
+          </v-data-table>
+        </v-col>
+      </v-row>
       <!--DIALOGO NUEVO-->
       <v-dialog
         v-model="dialogNuevo"
@@ -129,10 +150,10 @@
                 <v-col cols="12" md="6" sm="4">
                   <v-select
                     :items="lote"
-                    label="Nombre del lote"
+                    label="Lotes"
                     item-value="id"
                     item-text="nombreLote"
-                    v-model="traspasoAttributes.loteOriginal"
+                    v-model="traspasoAttributes.idLote"
                     :rules="required"
                   ></v-select>
                 </v-col>
@@ -211,7 +232,7 @@
                     label="Nombre del lote"
                     item-value="id"
                     item-text="nombreLote"
-                    v-model="traspasoAttributes.loteDestino"
+                    v-model="traspasoAttributes.idLote"
                     :rules="required"
                   ></v-select>
                 </v-col>
@@ -278,9 +299,9 @@
               width="120"
               class="green px13 font-weight-regular pr-4"
               small
-              @click="onClickDelet(item)"
+              @click="onClickDelet()"
             >
-            <v-icon left> mdi-check</v-icon>Desactivar
+              <v-icon left> mdi-check</v-icon>Desactivar
             </v-btn>
             <v-btn
               elevation="0"
@@ -362,13 +383,27 @@ export default {
       dialogNuevo: false,
       dialogEditar: false,
       dialogEliminar: false,
-      dialogEliminarConfirmacion:false,
+      dialogEliminarConfirmacion: false,
       traspaso: [],
+      traspasoDetalle:[],
       hato: [],
       lote: [],
       headers: [
         { text: "Número de Arete", value: "numArete" },
         { text: "Nombre de Lote Original", value: "loteOriginal" },
+        { text: "Descripción", value: "descripcion" },
+        { text: "Estatus", value: "estatus" },
+        { text: "Motivo", value: "motivo" },
+        { text: "Fecha de Creación", value: "fechaCreacion" },
+        { text: "Fecha de Modificación", value: "fechaModificacion" },
+        { text: "Fecha de Cancelación", value: "fechaCancelacion" },
+        { text: "Motivo de Cancelación", value: "motivoDeCancelacion" },
+        { text: "Encargado", value: "usuario" },
+        { text: "Actions", value: "actions" },
+      ],
+      headersDetalle: [
+        { text: "Número de Arete", value: "numArete" },
+        { text: "Nombre de Lote", value: "loteOriginal" },
         { text: "Descripción", value: "descripcion" },
         { text: "Estatus", value: "estatus" },
         { text: "Motivo", value: "motivo" },
@@ -418,31 +453,84 @@ export default {
       this.dialogNuevo = true;
     },
     editItem(item) {
-      (this.dialogEditar = true), (this.loteAttributes = { ...item });
+      (this.dialogEditar = true), (this.traspasoAttributes = { ...item });
     },
     deleteItem(item) {
-        this.dialogEliminarConfirmacion = true
+      this.dialogEliminarConfirmacion = true;
+      this.traspasoAttributes = { ...item }
     },
-    onClickNew() {
-        if(this.$refs.formTraspasoNuevo.validate()){
+    async onClickNew() {
+      if (this.$refs.formTraspasoNuevo.validate()) {
+        /*const response = await get("/traspaso/getTraspasoById/" + this.traspasoAttributes.numArete);
+        if (response.error === true) {
+          console.log(response);
+          console.log("No esta registrado");*/
           const postData = new URLSearchParams();
-          postData.append('numArete', this.traspasoAttributes.numArete);
-          postData.append('descripcion', this.traspasoAttributes.descripcion);
-          postData.append('motivo', this.traspasoAttributes.motivo);
-          postData.append('loteOriginal', this.traspasoAttributes.loteOriginal);
-          postData.append('idUsuario', this.userJson.idUsuario);
-          axios.post("http://localhost:8084/GanaderiaWS/ws/traspaso/registrarTraspaso/",postData)
-          .then(response=>{ 
-          console.log(response.data.mensaje);
+            postData.append("numArete", this.traspasoAttributes.numArete);
+            postData.append("descripcion", this.traspasoAttributes.descripcion);
+            postData.append("motivo", this.traspasoAttributes.motivo);
+            postData.append("idLote", this.traspasoAttributes.idLote);
+            postData.append("idUsuario", this.userJson.idUsuario);
+            axios.post("http://localhost:8084/GanaderiaWS/ws/traspaso/registrarTraspaso/",postData)
+              .then(response=>{ 
+              console.log(response.data.mensaje);
+              this.$refs.formTraspasoNuevo.reset(),
+              this.dialogNuevo=false;
+              this.traspaso=[],
+              this.getTraspaso();
+              
+              }).catch(rr => console.log(rr)); 
+          /*return;
+        } else {
+          console.log("Ya esta registrado");
+          console.log(response);
           this.$refs.formTraspasoNuevo.reset(),
           this.dialogNuevo=false;
-          
-          }).catch(rr => console.log(rr));  
-          console.log( this.traspasoAttributes.numArete, this.traspasoAttributes.descripcion, this.traspasoAttributes.motivo, this.traspasoAttributes.loteOriginal, this.userJson.idUsuario) 
-        }
+          this.traspaso=[],
+          this.getTraspaso();
+        }*/
+        console.log(
+          this.traspasoAttributes.numArete,
+          this.traspasoAttributes.descripcion,
+          this.traspasoAttributes.motivo,
+          this.traspasoAttributes.idLote,
+          this.userJson.idUsuario
+        );
+      }
     },
-    onClickEdit(item) {},
-    onClickDelet(item){},
+    onClickEdit(item) {
+      const postData = new URLSearchParams();
+      postData.append("idTraspaso", this.traspasoAttributes.idTraspaso);
+      postData.append("numArete", this.traspasoAttributes.numArete);
+      postData.append("descripcion", this.traspasoAttributes.descripcion);
+      postData.append("motivo", this.traspasoAttributes.motivo);
+      postData.append("idLote", this.traspasoAttributes.idLote);
+      postData.append("idUsuario", this.userJson.idUsuario);
+      axios.post("http://localhost:8084/GanaderiaWS/ws/traspaso/actualizarTraspaso/",postData)
+      .then(response=>{ 
+        console.log(response.data.mensaje);
+        this.$refs.formTraspasoEdit.reset(),
+        this.dialogEditar=false;
+        this.traspaso=[],
+        this.getTraspaso();
+              
+      }).catch(rr => console.log(rr)); 
+    },
+    onClickDelet() {
+      const postData = new URLSearchParams();
+      postData.append("idTraspaso", this.traspasoAttributes.idTraspaso);
+      postData.append("motivoDeCancelacion", this.traspasoAttributes.motivoDeCancelacion);
+      postData.append("idUsuario", this.userJson.idUsuario);
+      axios.post("http://localhost:8084/GanaderiaWS/ws/traspaso/eliminarTraspaso/",postData)
+      .then(response=>{ 
+        console.log(response.data.mensaje);
+        this.$refs.formTraspasoDelet.reset(),
+        this.dialogEliminar=false;
+        this.traspaso=[],
+        this.getTraspaso();
+              
+      }).catch(rr => console.log(rr)); 
+    },
     cerrarVentanaNuevo() {
       this.$refs.formTraspasoNuevo.reset();
       this.dialogNuevo = false;
@@ -451,16 +539,14 @@ export default {
       this.$refs.formTraspasoEdit.reset();
       this.dialogEditar = false;
     },
-    cerrarVentanaDelete(){
-        this.$refs.formTraspasoDelet.reset(),
-        this.dialogEliminar = false
+    cerrarVentanaDelete() {
+      this.$refs.formTraspasoDelet.reset(), (this.dialogEliminar = false);
     },
-    onClickDeletConfirmacion(){
-        this.dialogEliminarConfirmacion = false,
-        this.dialogEliminar = true
+    onClickDeletConfirmacion() {
+      (this.dialogEliminarConfirmacion = false), (this.dialogEliminar = true);
     },
-    cerrarVentanaConfirmacion(){
-        this.dialogEliminarConfirmacion=false
+    cerrarVentanaConfirmacion() {
+      this.dialogEliminarConfirmacion = false;
     },
     async getTraspaso() {
       const response = await get("/traspaso/getAllTraspaso/");
@@ -497,12 +583,15 @@ export default {
           for (let i in response.data) {
             this.lote.push({
               nombreLote: response.data[i]["nombreLote"],
-              id: response.data[i]["nombreLote"],
+              id: response.data[i]["idLote"],
             });
           }
         })
         .catch((e) => console.log(e));
     },
+    async getMovimientosTraspaso(){
+      //Aqui es donde muestra lo del trigger
+    }
   },
 };
 </script>

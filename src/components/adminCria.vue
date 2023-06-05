@@ -5,7 +5,7 @@
       <v-card-text>
         <v-card-title>Administración de Cria</v-card-title>
       </v-card-text>
-      <v-row>
+      <!--<v-row>
         <v-card elevation="24" shaped width="100%" dense class="ml-15 mr-15">
           <v-card-text>
             <v-form ref="formBusqueda" v-model="valid">
@@ -24,7 +24,7 @@
                 <v-icon dark left>mdi-monitor-shimmer</v-icon>Limpiar</v-btn>
             </v-card-actions>       
         </v-card>
-      </v-row>
+      </v-row>-->
 
       <!--NUEVO-->
       <v-row align="start" justify="start">
@@ -139,6 +139,16 @@
                   <v-col cols="12" md="6" sm="4">
                     <v-select :items="raza" label="Raza" item-value="id" item-text="nombre"  v-model="criaAttributes.idRaza" :rules="required"></v-select>
                   </v-col> 
+                  <v-col cols="12" md="6" sm="4">
+                  <v-select
+                    :items="estatusItems"
+                    label="Estatus"
+                    :item-value="criaAttributes.estatus"
+                    :item-text="criaAttributes.estatus"
+                    v-model="criaAttributes.estatus"
+                    :rules="required"
+                  ></v-select>
+                </v-col>
                 </v-row>
               </v-form>
             </v-card-text>
@@ -203,6 +213,7 @@
     props:['userJson'],
     data(){
       return{ 
+        estatusItems: ["Activo", "Inactivo"],
         date: new Date().toISOString().substr(0, 10),
         menu2: false,
         dialogNuevo:false,
@@ -243,6 +254,12 @@
         },
         required:[(v) => !!v || "Este campo es requerido"],  
       };
+    },
+    beforeMount(){
+      this.$root.$on("actualizarPestanias", data => {
+        console.log("Hola esde crias con el hato: " + data);
+        this.getCria(data);
+      })
     },
     async created(){
       this.getCria();
@@ -316,12 +333,14 @@
           postData.append('idRaza', this.criaAttributes.idRaza);
           postData.append('observaciones', this.criaAttributes.observaciones);
           postData.append('idUsuario', this.userJson.idUsuario);
+          postData.append('estatus', this.criaAttributes.estatus);
           axios.post("http://localhost:8084/GanaderiaWS/ws/cria/actualizarCria/",postData)
           .then(response=>{ 
           console.log(response.data.mensaje);
           this.$refs.formCriaEditar.reset(),
           this.dialogEditar=false;
-          this.created()
+          this.cria = [];
+          this.getCria();
           }).catch(rr => console.log(rr));   
         }
        
@@ -334,7 +353,8 @@
           console.log(response.data.mensaje);
           
           this.dialogEliminar=false;
-          this.cria.splice();
+          this.cria = [];
+          this.getCria();
       
           
           }).catch(rr => console.log(rr));  
@@ -351,9 +371,16 @@
       cerrarVentanaDelete(){
         this.dialogEliminar=false
       },
-      async getCria(){
+      async getCria(idHato){
+        this.cria = [];
          //Get Data of Cria
-        await axios.get("http://localhost:8084/GanaderiaWS/ws/cria/getAllCria/")
+         var url = "";
+         if(idHato){
+          url = "http://localhost:8084/GanaderiaWS/ws/cria/getCriaById/"+idHato;
+         } else{
+          url = "http://localhost:8084/GanaderiaWS/ws/cria/getAllCria/";
+         }
+        await axios.get(url)
         .then(response=>{
         console.log(response)
         for(let i in response.data){this.cria.push(response.data[i]) }}).catch(e => console.log(e));

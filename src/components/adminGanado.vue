@@ -174,6 +174,7 @@
         </v-card>
       </v-dialog>
       <!--FIN DIALOGO ELIMINAR-->
+      <!--CRIA Y VETERINARIO-->
       <v-tabs v-model="tab" class="tabs" fixed-tabs bg-color="indigo-darken-2">
         <v-tab href="#cria">
             <span>Administración de Cria</span> 
@@ -381,6 +382,7 @@
         await axios.get("http://localhost:8084/GanaderiaWS/ws/hato/getAllHato/")
         .then(response=>{
         console.log(response)
+        console.log(JSON.stringify(response))
         for(let i in response.data){this.ganado.push(response.data[i]) }}).catch(e => console.log(e));
       },
       onClickFila(item,row){
@@ -388,10 +390,14 @@
             console.log(row)
             row.select(true)
             this.idHatoSelect=item.numArete
-            this.getInformacionLaboral(this.idHatoSelect)
+            this.$root.$emit('actualizarPestanias',item.numArete)
         },
-      async getInformacionLaboral(numArete){
-
+      async getInformacionCrias(numArete){
+  //Get Data of ganado
+      await axios.get("http://localhost:8084/GanaderiaWS/ws/cria/getCriaById/"+numArete)
+            .then(response=>{
+            console.log(response)
+            for(let i in response.data){this.ganado.push(response.data[i]) }}).catch(e => console.log(e));
       }
     },
   };
