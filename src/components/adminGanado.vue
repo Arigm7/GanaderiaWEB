@@ -11,15 +11,13 @@
             <v-form ref="formBusqueda" v-model="valid">
               <v-row>
                 <v-col cols="12" md="2" sm="6">
-                  <v-text-field label="Búsqueda" required/>
+                  <v-text-field label="Búsqueda" required v-model="search"/>
                 </v-col>
               </v-row>
             </v-form>
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn rounded color="#1C4C96" dark small @click="onClickBuscar">
-              <v-icon dark left>mdi-magnify</v-icon>Buscar</v-btn>
             <v-btn rounded color="#558B2F" dark small @click="onClickLimpiar">
               <v-icon dark left>mdi-monitor-shimmer</v-icon>Limpiar</v-btn>
           </v-card-actions>       
@@ -37,7 +35,7 @@
       <!--TABLA-->
       <v-row>
         <v-col cols="12">
-          <v-data-table :headers="headers" :items="ganado" :items-per-page="5" item-key="numArete" single-select @click:row="onClickFila" class="ml-15 mr-15" dense>
+          <v-data-table :headers="headers" :items="ganado" :items-per-page="5" item-key="numArete" :search="search" single-select @click:row="onClickFila" class="ml-15 mr-15" dense>
             <template v-slot:[`item.actions`]="{ item }">
               <v-row style="width: 8vw;">
                 <v-tooltip bottom>
@@ -222,6 +220,7 @@
 
     data(){
       return{ 
+        search:'',
         tab: null,
         idHatoSelect:null,
         dialogNuevo:false,
