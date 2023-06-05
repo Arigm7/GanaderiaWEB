@@ -69,9 +69,15 @@
           <v-card-text>
             <v-form ref="formGanadoNuevo" v-model="valid" lazy-validation>
               <v-row align="center" justify="start">
-                <v-col  v-for=" attributes in attibutesNames" cols="12" md="6" sm="4">  
+                <!--<v-col  v-for=" attributes in attibutesNames" cols="12" md="6" sm="4">  
                   <v-text-field v-model="ganadoAttributes[attributes]" :label=attributes :rules="required"></v-text-field>
-                </v-col>  
+                </v-col>  -->
+                <v-col  cols="12" md="6" sm="4">  
+                  <v-text-field v-model="ganadoAttributes.numArete" label="Número de Arete" :rules="required" ></v-text-field>
+                </v-col> 
+                <v-col  cols="12" md="6" sm="4">  
+                  <v-text-field v-model="ganadoAttributes.descripcion" label="Descripción" :rules="required" ></v-text-field>
+                </v-col> 
                 <v-col cols="12" md="6" sm="4">
                   <v-select  :items="raza" label="Razas" item-value="id" item-text="nombre" v-model="ganadoAttributes.raza" :rules="required"></v-select>
                 </v-col> 
@@ -82,8 +88,15 @@
                   <v-select :items="rancho" label="Ranchos" item-value="id" item-text="nombre" v-model="ganadoAttributes.rancho" :rules="required"></v-select>
                 </v-col> 
                 <v-col cols="12" md="6" sm="4">
-                  <v-select :items="lote" label="Lotes" item-value="id" item-text="nombreLote" v-model="ganadoAttributes.lote" :rules="required"></v-select>
-                </v-col> 
+                  <v-select
+                    :items="lote"
+                    label="Lotes"
+                    item-value="id"
+                    item-text="nombreLote"
+                    v-model="ganadoAttributes.idLote"
+                    :rules="required"
+                  ></v-select>
+                </v-col>
                 <v-col cols="12" md="6" sm="4">
                   <v-select :items="tipoGanado" label="Tipo de ganado" :item-value="ganadoAttributes.tipoGanado" :item-text="ganadoAttributes.tipoGanado" v-model="ganadoAttributes.tipoGanado" :rules="required"></v-select>
                 </v-col> 
@@ -106,13 +119,19 @@
       <!--DIALOGO EDITAR-->
       <v-dialog v-model="dialogEditar" persistent max-width="1000" transition="dialog-transition">
         <v-card>
-          <v-card-title>Ganado</v-card-title>
+          <v-card-title>Editar Ganado</v-card-title>
           <v-card-text>
             <v-form ref="formGanado" v-model="valid" lazy-validation>
               <v-row align="center" justify="start">
-                <v-col  v-for=" attributes in attibutesNames" cols="12" md="6" sm="4">  
+                <!--<v-col  v-for=" attributes in attibutesNames" cols="12" md="6" sm="4">  
                   <v-text-field v-model="ganadoAttributes[attributes]" :label=attributes :rules="required" ></v-text-field>
-                </v-col>  
+                </v-col>  -->
+                <v-col  cols="12" md="6" sm="4">  
+                  <v-text-field v-model="ganadoAttributes.numArete" label="Número de Arete" :rules="required" ></v-text-field>
+                </v-col> 
+                <v-col  cols="12" md="6" sm="4">  
+                  <v-text-field v-model="ganadoAttributes.descripcion" label="Descripción" :rules="required" ></v-text-field>
+                </v-col> 
                 <v-col cols="12" md="6" sm="4">
                   <v-select  :items="raza" label="Razas" item-value="id" item-text="nombre" v-model="ganadoAttributes.idRaza" :rules="required"></v-select>
                 </v-col> 
@@ -128,6 +147,9 @@
                 <v-col cols="12" md="6" sm="4">
                   <v-select :items="tipoGanado" label="Tipo de ganado" :item-value="ganadoAttributes.tipoGanado" :item-text="ganadoAttributes.tipoGanado" v-model="ganadoAttributes.tipoGanado" :rules="required"></v-select>
                 </v-col> 
+                <v-col cols="12" md="6" sm="4">
+                    <v-select :items="estatusItems" label="Estatus" :item-value="ganadoAttributes.estatus" :item-text="ganadoAttributes.estatus" v-model="ganadoAttributes.estatus" :rules="required"></v-select>
+                  </v-col>
               </v-row>
             </v-form>
           </v-card-text>
@@ -240,7 +262,7 @@
           rancho:null,
           idRancho:null,
           tipoGanado:null,
-          lote:null,
+          nombreLote:null,
           idLote:null,
           estatus:null,
           idUsuario:null,
@@ -272,6 +294,7 @@
         raza:[],
         lote:[],
         rancho:[],
+        estatusItems: ["Activo", "Inactivo"],
       };
     },
     async created(){
@@ -283,15 +306,13 @@
       await axios.get("http://localhost:8084/GanaderiaWS/ws/raza/getAllRazaActivo")
       .then(response=>{
       for(let i in response.data){this.raza.push({nombre:response.data[i]["nombre"],id:response.data[i]["idRaza"]}) }}).catch(e => console.log(e));
-      // Get Lote
-      await axios.get("http://localhost:8084/GanaderiaWS/ws/lote/getAllLoteActivo")
-      .then(response=>{
-      for(let i in response.data){this.lote.push({nombre:response.data[i]["nombreLote"],id:response.data[i]["idLote"]}) }}).catch(e => console.log(e));
+      this.getLote();
       // Get Rancho
       await axios.get("http://localhost:8084/GanaderiaWS/ws/rancho/getAllRanchoActivo")
       .then(response=>{
       for(let i in response.data){this.rancho.push({nombre:response.data[i]["nombre"],id:response.data[i]["idRancho"]}) }}).catch(e => console.log(e));
-      console.log(this.userJson)
+     // console.log(this.userJson)
+      //console.log(this.lote)
       
     },
     mounted(){},
@@ -307,37 +328,79 @@
       },
       editItem(item){
         this.dialogEditar=true,
-        this.ganadoAttributes={...item},
-        console.log(this.ganadoAttributes)
+        this.ganadoAttributes={...item}
+        //console.log(this.ganadoAttributes)
       },
       onClickNew(){
         if(this.$refs.formGanadoNuevo.validate()){
+          const postData = new URLSearchParams();
+            postData.append('numArete', this.ganadoAttributes.numArete);
+            postData.append('sexo', this.ganadoAttributes.sexo);
+            postData.append('descripcion', this.ganadoAttributes.descripcion);
+            postData.append('tipoGanado', this.ganadoAttributes.tipoGanado);
+            postData.append('idUsuario', this.userJson.idUsuario);
+            postData.append('idRaza', this.ganadoAttributes.raza);
+            postData.append('idLote', this.ganadoAttributes.idLote);
+            postData.append('idRancho', this.ganadoAttributes.rancho);
+            //console.log(postData)
+           axios.post("http://localhost:8084/GanaderiaWS/ws/hato/registrarHato/",postData)
+            .then(response=>{
+            console.log(response.data.mensaje)
+            this.$refs.formGanadoNuevo.reset();
+            this.dialogNuevo=false;
+            this.ganado=[];
+            this.getHato();
 
+            })
+            .catch(rr => console.log(rr));
         }
+        console.log(this.ganadoAttributes.numArete)
+            console.log(this.ganadoAttributes.sexo)
+            console.log(this.ganadoAttributes.descripcion)
+            console.log( this.ganadoAttributes.tipoGanado)
+            console.log( this.userJson.idUsuario)
+            console.log(this.ganadoAttributes.raza)
+            console.log(this.ganadoAttributes.idLote)
+            console.log(this.ganadoAttributes.rancho)
+        
       },      
       onClickEdit(){
-        console.log(this.ganadoAttributes.raza.id)
+       // console.log(this.ganadoAttributes.raza.id)
         if(this.$refs.formGanado.validate()){
+            const postData = new URLSearchParams();
+            postData.append('numArete', this.ganadoAttributes.numArete);
+            postData.append('sexo', this.ganadoAttributes.sexo);
+            postData.append('descripcion', this.ganadoAttributes.descripcion);
+            postData.append('tipoGanado', this.ganadoAttributes.tipoGanado);
+            postData.append('idUsuario', this.userJson.idUsuario);
+            postData.append('idRaza', this.ganadoAttributes.idRaza);
+            postData.append('idLote', this.ganadoAttributes.idLote);
+            postData.append('idRancho', this.ganadoAttributes.idRancho);
+             postData.append('estatus', this.ganadoAttributes.estatus);
+            //console.log(postData)
+            axios.post("http://localhost:8084/GanaderiaWS/ws/hato/actualizarHato/",postData)
+            .then(response=>{
+            console.log(response.data.mensaje)
+            this.$refs.formGanado.reset();
+            this.dialogEditar=false;
+            this.ganado=[];
+            this.getHato();
+
+            })
+            .catch(rr => console.log(rr));
+            console.log(this.ganadoAttributes.numArete)
+            console.log(this.ganadoAttributes.sexo)
+            console.log(this.ganadoAttributes.descripcion)
+            console.log( this.ganadoAttributes.tipoGanado)
+            console.log(this.ganadoAttributes.idRaza)
+            console.log(this.ganadoAttributes.idLote)
+            console.log(this.ganadoAttributes.idRancho)
+            console.log(this.ganadoAttributes.estatus)
+      
 
 
         }
-            //const postData = new URLSearchParams();
-            //postData.append('numArete', this.ganadoAttributes.numArete);
-            //postData.append('sexo', this.ganadoAttributes.sexo);
-            //postData.append('descripcion', this.ganadoAttributes.descripcion);
-            //postData.append('tipoGanado', this.ganadoAttributes.tipoGanado);
-            //postData.append('idUsuario', this.ganadoAttributes.idUsuario);
-            //postData.append('idRaza', this.ganadoAttributes.idRaza);
-            //postData.append('idLote', this.ganadoAttributes.idLote);
-            //postData.append('idRancho', this.ganadoAttributes.idRancho);
-            //console.log(postData)
-            //axios.post("http://localhost:8084/GanaderiaWS/ws/hato/actualizarHato/",postData)
-            //then(response=>{
-            //console.log(response.data.mensaje)
-            //console.log("hola")
-            //})
-            //.catch(rr => console.log(rr));
-            //this.dialogEditar=false
+
       },
       onClickDelet(){
         if(this.$refs.formGanadoEliminar.validate()){
@@ -348,25 +411,22 @@
           axios.post("http://localhost:8084/GanaderiaWS/ws/hato/eliminarHato/",postData)
             .then(response=>{ 
             console.log(response.data.mensaje);
-            
+            this.$refs.formGanadoEliminar.reset();
             this.dialogEliminar=false;
-            
+            this.ganado=[];
+            this.getHato();
             }).catch(rr => console.log(rr));  
         }
             
       },
-      onClickBuscar(){
-        console.log(this.userJson);
-        this.consultarHato();
-        this.consultarCrias();
-        this.ConsulartVeterinario();
-
-      },
       onClickLimpiar(){
-        this.$refs.formBusqueda.reset()
+        this.$refs.formBusqueda.reset(),
+        this.ganado=[],
+        this.getHato()
       },
       cerrarVentanaNuevo(){
-        this.dialogNuevo=false
+        this.dialogNuevo=false,
+        this.$refs.formGanadoNuevo.reset()
       },
       cerrarVentana(){
         this.$refs.formGanado.reset(),
@@ -380,24 +440,39 @@
         //Get Data of ganado
         await axios.get("http://localhost:8084/GanaderiaWS/ws/hato/getAllHato/")
         .then(response=>{
-        console.log(response)
-        console.log(JSON.stringify(response))
+        //console.log(response)
+        //console.log(JSON.stringify(response))
         for(let i in response.data){this.ganado.push(response.data[i]) }}).catch(e => console.log(e));
       },
+      async getLote() {
+      //Get Data of Hato
+      await axios
+        .get("http://localhost:8084/GanaderiaWS/ws/lote/getAllLoteActivo/")
+        .then((response) => {
+          //console.log(response);
+          for (let i in response.data) {
+            this.lote.push({
+              nombreLote: response.data[i]["nombreLote"],
+              id: response.data[i]["idLote"],
+            });
+          }
+        })
+        .catch((e) => console.log(e));
+    },
       onClickFila(item,row){
-            console.log(item)
-            console.log(row)
+            //console.log(item)
+            //console.log(row)
             row.select(true)
             this.idHatoSelect=item.numArete
             this.$root.$emit('actualizarPestanias',item.numArete)
         },
-      async getInformacionCrias(numArete){
+      /*async getInformacionCrias(numArete){
   //Get Data of ganado
       await axios.get("http://localhost:8084/GanaderiaWS/ws/cria/getCriaById/"+numArete)
             .then(response=>{
-            console.log(response)
+            //console.log(response)
             for(let i in response.data){this.ganado.push(response.data[i]) }}).catch(e => console.log(e));
-      }
+      }*/
     },
   };
 </script>

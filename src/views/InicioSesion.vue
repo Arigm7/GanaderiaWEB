@@ -70,10 +70,10 @@ export default {
       const response = await post("/sesion/login/", this.usuario);
       //this.loader = false;
       if (response.error === true) {
-        console.log(response);
+        //console.log(response);
         return;
       } else {
-        console.log(response);
+       // console.log(response);
         this.$session.start();
         this.$session.set("usuario", JSON.parse(response.respuesta));
         this.$router.push({

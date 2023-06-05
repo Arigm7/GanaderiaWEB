@@ -5,26 +5,24 @@
       <v-card-text>
         <v-card-title>Administración de Cria</v-card-title>
       </v-card-text>
-      <!--<v-row>
+      <v-row>
         <v-card elevation="24" shaped width="100%" dense class="ml-15 mr-15">
           <v-card-text>
             <v-form ref="formBusqueda" v-model="valid">
               <v-row>
                 <v-col cols="12" md="2" sm="6">
-                  <v-text-field label="Búsqueda" required/>
+                  <v-text-field label="Búsqueda" required v-model="buscarCria"/>
                 </v-col>
               </v-row>
             </v-form>
           </v-card-text>
            <v-card-actions>
             <v-spacer></v-spacer>
-              <v-btn rounded color="#1C4C96" dark small @click="onClickBuscar">
-                <v-icon dark left>mdi-magnify</v-icon>Buscar</v-btn>
               <v-btn rounded color="#558B2F" dark small @click="onClickLimpiar">
                 <v-icon dark left>mdi-monitor-shimmer</v-icon>Limpiar</v-btn>
             </v-card-actions>       
         </v-card>
-      </v-row>-->
+      </v-row>
 
       <!--NUEVO-->
       <v-row align="start" justify="start">
@@ -37,7 +35,7 @@
       <!--TABLA-->
       <v-row>
         <v-col cols="12">
-          <v-data-table :headers="headers" :items="cria" :items-per-page="5" class="ml-15 mr-15" dense>
+          <v-data-table :headers="headers" :items="cria" :items-per-page="5" class="ml-15 mr-15" dense :search="buscarCria">
             <template v-slot:[`item.actions`]="{ item }">
               <v-row style="width: 8vw;">
                 <v-tooltip bottom>
@@ -224,8 +222,8 @@
         razaEdit:null,
         valid:null,
         validEliminar:null, 
-            
-        showCrearCria:true ,
+        buscarCria:null,
+        showCrearCria:true,
         headers: [
           { text: 'Número de arete', value: 'numArete' },
           { text: 'Sexo', value: 'sexo' },
@@ -263,11 +261,13 @@
     },
     async created(){
       this.getCria();
+      this.getHato();
+      this.getRaza();
       /*Get Data of Cria
       await axios.get("http://localhost:8084/GanaderiaWS/ws/cria/getAllCria/")
       .then(response=>{
       console.log(response)
-      for(let i in response.data){this.cria.push(response.data[i]) }}).catch(e => console.log(e));*/
+      for(let i in response.data){this.cria.push(response.data[i]) }}).catch(e => console.log(e));
       //Get Data of Hato
       await axios.get("http://localhost:8084/GanaderiaWS/ws/hato/getAllHatoActivo/")
       .then(response=>{
@@ -277,7 +277,7 @@
       await axios.get("http://localhost:8084/GanaderiaWS/ws/raza/getAllRazaActivo")
       .then(response=>{
       for(let i in response.data){this.raza.push({nombre:response.data[i]["nombre"],id:response.data[i]["idRaza"]}) }}).catch(e => console.log(e));
-      console.log(this.userJson.idUsuario)
+      console.log(this.userJson.idUsuario)*/
       
     },
     mounted(){},
@@ -298,7 +298,13 @@
 
       },
       onClickLimpiar(){
-        this.$refs.formBusqueda.reset()
+        this.$refs.formBusqueda.reset(),
+        this.cria = [],
+        this.hato=[],
+        this.raza=[],
+        this.getCria(),
+        this.getHato(),
+        this.getRaza()
       },
       onclickNuevoCria(){
         this.dialogNuevo=true
@@ -385,6 +391,20 @@
         console.log(response)
         for(let i in response.data){this.cria.push(response.data[i]) }}).catch(e => console.log(e));
       },
+      async getHato(){
+        //Get Data of Hato
+      await axios.get("http://localhost:8084/GanaderiaWS/ws/hato/getAllHatoActivo/")
+      .then(response=>{
+      console.log(response)
+      for(let i in response.data){this.hato.push({numArete:response.data[i]["numArete"],id:response.data[i]["numArete"]}) }}).catch(e => console.log(e));
+      },
+      async getRaza(){
+      // Get Raza
+      await axios.get("http://localhost:8084/GanaderiaWS/ws/raza/getAllRazaActivo")
+      .then(response=>{
+      for(let i in response.data){this.raza.push({nombre:response.data[i]["nombre"],id:response.data[i]["idRaza"]}) }}).catch(e => console.log(e));
+      console.log(this.userJson.idUsuario)
+      }
     },
   };
 </script>

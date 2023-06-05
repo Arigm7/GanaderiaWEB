@@ -5,28 +5,29 @@
       <v-card-text>
         <v-card-title>Administración de Visitas - Veterinario</v-card-title>
       </v-card-text>
-      <!--<v-row>
+      <v-row>
         <v-card elevation="24" shaped width="100%" dense class="ml-15 mr-15">
           <v-card-text>
             <v-form ref="formBusqueda" v-model="valid">
               <v-row>
                 <v-col cols="12" md="2" sm="6">
-                  <v-text-field label="Búsqueda" required />
+                  <v-text-field
+                    label="Búsqueda"
+                    required
+                    v-model="buscarVisita"
+                  />
                 </v-col>
               </v-row>
             </v-form>
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn rounded color="#1C4C96" dark small @click="onClickBuscar">
-              <v-icon dark left>mdi-magnify</v-icon>Buscar</v-btn
-            >
             <v-btn rounded color="#558B2F" dark small @click="onClickLimpiar">
               <v-icon dark left>mdi-monitor-shimmer</v-icon>Limpiar</v-btn
             >
           </v-card-actions>
         </v-card>
-      </v-row>-->
+      </v-row>
 
       <!--NUEVO-->
       <v-row align="start" justify="start">
@@ -52,6 +53,7 @@
             :items="visita"
             :items-per-page="5"
             class="ml-15 mr-15"
+            :search="buscarVisita"
             dense
           >
             <template v-slot:[`item.actions`]="{ item }">
@@ -96,34 +98,37 @@
         <v-card>
           <v-card-title>Nueva Visita</v-card-title>
           <v-card-text>
-            <v-form ref="formVisitaNuevo" v-model="valid">
+            <v-form ref="formVisitaNuevo" v-model="valid" lazy-validation>
               <v-row align="center" justify="start">
                 <v-col cols="12" md="6" sm="4">
                   <v-text-field
                     v-model="visitaAttributes.nombreVisita"
                     label="Nombre del veterinario"
-                    required
+                    :rules="required"
                   ></v-text-field>
                 </v-col>
                 <v-col cols="12" md="6" sm="4">
-                  <v-text-field
-                    v-model="visitaAttributes.numArete"
+                  <v-select
+                    :items="hato"
                     label="Número de Arete"
-                    required
-                  ></v-text-field>
+                    item-value="id"
+                    item-text="numArete"
+                    v-model="visitaAttributes.numArete"
+                    :rules="required"
+                  ></v-select>
                 </v-col>
                 <v-col cols="12" md="6" sm="4">
                   <v-text-field
                     v-model="visitaAttributes.motivo"
                     label="Motivo"
-                    required
+                    :rules="required"
                   ></v-text-field>
                 </v-col>
                 <v-col cols="12" md="6" sm="4">
                   <v-text-field
                     v-model="visitaAttributes.observaciones"
                     label="Observaciones"
-                    required
+                    :rules="required"
                   ></v-text-field>
                 </v-col>
               </v-row>
@@ -138,7 +143,7 @@
               width="120"
               class="green px13 font-weight-regular pr-4"
               small
-              @click="saveItem()"
+              @click="onClickNew()"
             >
               <v-icon left> mdi-check</v-icon>Guardar
             </v-btn>
@@ -167,34 +172,37 @@
         <v-card>
           <v-card-title>Editar Visita</v-card-title>
           <v-card-text>
-            <v-form ref="formVisitaEdit" v-model="valid">
+            <v-form ref="formVisitaEdit" v-model="valid" lazy-validation>
               <v-row align="center" justify="start">
                 <v-col cols="12" md="6" sm="4">
                   <v-text-field
                     v-model="visitaAttributes.nombreVisita"
                     label="Nombre del veterinario"
-                    required
+                    :rules="required"
                   ></v-text-field>
                 </v-col>
                 <v-col cols="12" md="6" sm="4">
-                  <v-text-field
-                    v-model="visitaAttributes.numArete"
+                  <v-select
+                    :items="hato"
                     label="Número de Arete"
-                    required
-                  ></v-text-field>
+                    item-value="id"
+                    item-text="numArete"
+                    v-model="visitaAttributes.numArete"
+                    :rules="required"
+                  ></v-select>
                 </v-col>
                 <v-col cols="12" md="6" sm="4">
                   <v-text-field
                     v-model="visitaAttributes.motivo"
                     label="Motivo"
-                    required
+                    :rules="required"
                   ></v-text-field>
                 </v-col>
                 <v-col cols="12" md="6" sm="4">
                   <v-text-field
                     v-model="visitaAttributes.observaciones"
                     label="Observaciones"
-                    required
+                    :rules="required"
                   ></v-text-field>
                 </v-col>
               </v-row>
@@ -209,7 +217,7 @@
               width="120"
               class="green px13 font-weight-regular pr-4"
               small
-              @click="saveEdit()"
+              @click="onClickEdit()"
             >
               <v-icon left> mdi-check</v-icon>Guardar
             </v-btn>
@@ -290,6 +298,7 @@ export default {
   props: ["userJson"],
   data() {
     return {
+      buscarVisita: null,
       dialogNuevo: false,
       dialogEditar: false,
       dialogEliminar: false,
@@ -309,28 +318,31 @@ export default {
       },
       showCrearGanado: true,
       headers: [
+        { text: "Número de arete", value: "numArete" },
         { text: "Veterinario", value: "nombreVisita" },
         { text: "Fecha de la visita", value: "fechaVisita" },
         { text: "motivo", value: "motivo" },
         { text: "Observaciones", value: "observaciones" },
         { text: "Estatus", value: "estatus" },
-        { text: "Número de arete", value: "numArete" },
         { text: "Encargado", value: "usuario" },
         { text: "Actions", value: "actions" },
       ],
 
       visita: [],
+      hato:[],
+      required:[(v) => !!v || "Este campo es requerido"], 
     };
   },
-  beforeMount(){
-      this.$root.$on("actualizarPestanias", data => {
-        console.log("Hola esde crias con el hato: " + data);
-        this.getVisita(data);
-      })
-    },
+  beforeMount() {
+    this.$root.$on("actualizarPestanias", (data) => {
+      console.log("Hola esde crias con el hato: " + data);
+      this.getVisita(data);
+    });
+  },
   created() {
     this.getVisita();
-    console.log(this.userJson);
+    this.getHato();
+    //console.log(this.userJson);
   },
   mounted() {},
   computed: {},
@@ -338,30 +350,61 @@ export default {
   methods: {
     editItem(item) {
       (this.dialogEditar = true),
-        (this.visitaAttributes = { ...item }),
-        console.log(this.visitaAttributes);
+        (this.visitaAttributes = { ...item })
+        //console.log(this.visitaAttributes);
     },
-    saveEdit() {
-      console.log(this.visitaAttributes.raza.id);
-      //const postData = new URLSearchParams();
-      //postData.append('numArete', this.ganadoAttributes.numArete);
-      //postData.append('sexo', this.ganadoAttributes.sexo);
-      //postData.append('descripcion', this.ganadoAttributes.descripcion);
-      //postData.append('tipoGanado', this.ganadoAttributes.tipoGanado);
-      //postData.append('idUsuario', this.ganadoAttributes.idUsuario);
-      //postData.append('idRaza', this.ganadoAttributes.idRaza);
-      //postData.append('idLote', this.ganadoAttributes.idLote);
-      //postData.append('idRancho', this.ganadoAttributes.idRancho);
-      //console.log(postData)
-      //axios.post("http://localhost:8084/GanaderiaWS/ws/hato/actualizarHato/",postData)
-      //then(response=>{
-      //console.log(response.data.mensaje)
-      //console.log("hola")
-      //})
-      //.catch(rr => console.log(rr));
-      //this.dialogEditar=false
+    onClickEdit() {
+      if(this.$refs.formVisitaEdit.validate()){
+          const postData = new URLSearchParams();
+          postData.append('idVisita', this.visitaAttributes.idVisita);
+          postData.append('nombreVisita', this.visitaAttributes.nombreVisita);
+          postData.append('motivo', this.visitaAttributes.motivo);
+          postData.append('observaciones', this.visitaAttributes.observaciones);
+          postData.append('numArete', this.visitaAttributes.numArete);
+          postData.append('idUsuario', this.userJson.idUsuario);
+          axios.post("http://localhost:8084/GanaderiaWS/ws/veterinario/actualizarVeterinario/",postData)
+          .then(response=>{ 
+          console.log(response.data.mensaje);
+          this.$refs.formVisitaEdit.reset(),
+          this.dialogEditar=false;
+          this.visita = [];
+          this.getVisita();
+          }).catch(rr => console.log(rr));   
+        }
     },
-    saveItem() {},
+    onClickNew() {
+      if(this.$refs.formVisitaNuevo.validate()){
+          const postData = new URLSearchParams();
+          postData.append('nombreVisita', this.visitaAttributes.nombreVisita);
+          postData.append('motivo', this.visitaAttributes.motivo);
+          postData.append('observaciones', this.visitaAttributes.observaciones);
+          postData.append('numArete', this.visitaAttributes.numArete);
+          postData.append('idUsuario', this.userJson.idUsuario);
+          axios.post("http://localhost:8084/GanaderiaWS/ws/veterinario/registrarVeterinario/",postData)
+          .then(response=>{ 
+          console.log(response.data.mensaje);
+          this.$refs.formVisitaNuevo.reset(),
+          this.dialogNuevo=false;
+          this.visita = [];
+          this.getVisita();
+          }).catch(rr => console.log(rr));   
+        }
+    },
+    onClickDelet(){
+      const postData = new URLSearchParams();
+        postData.append('idVisita', this.visitaAttributes.idVisita);
+        axios.post("http://localhost:8084/GanaderiaWS/ws/veterinario/eliminarVeterinario/",postData)
+          .then(response=>{ 
+          console.log(response.data.mensaje);
+          
+          this.dialogEliminar=false;
+          this.visita = [];
+          this.getVisita();
+      
+          
+          }).catch(rr => console.log(rr));  
+          
+    },
     deleteItem(item) {
       (this.dialogEliminar = true), (this.visitaAttributes = { ...item });
     },
@@ -369,6 +412,11 @@ export default {
     onClickBuscar() {},
     onClickLimpiar() {
       this.$refs.formBusqueda.reset();
+      this.visita = [];
+      this.hato=[],
+      this.getVisita();
+      this.getHato()
+       
     },
     onclickNuevoVisita() {
       this.dialogNuevo = true;
@@ -384,13 +432,13 @@ export default {
     },
     async getVisita(idHato) {
       this.visita = [];
-         //Get Data of Veterinario
-         var url = "";
-         if(idHato){
-          url = "/veterinario/getVeterinarioById/"+idHato;
-         } else{
-          url = "/veterinario/getAllVeterinario/";
-         }
+      //Get Data of Veterinario
+      var url = "";
+      if (idHato) {
+        url = "/veterinario/getVeterinarioById/" + idHato;
+      } else {
+        url = "/veterinario/getAllVeterinario/";
+      }
       const response = await get(url);
       if (response.error === true) {
         console.log(response);
@@ -401,6 +449,14 @@ export default {
         this.visita = response;
       }
     },
+    async getHato(){
+      //Get Data of Hato
+      await axios.get("http://localhost:8084/GanaderiaWS/ws/hato/getAllHatoActivo/")
+      .then(response=>{
+      console.log(response)
+      for(let i in response.data){this.hato.push({numArete:response.data[i]["numArete"],id:response.data[i]["numArete"]}) }}).catch(e => console.log(e));
+      // Get Raza
+    }
   },
 };
 </script>

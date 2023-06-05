@@ -64,10 +64,10 @@
             };
         },
         created(){
-            console.log(this.$route?.params?.user)
+            //console.log(this.$route?.params?.user)
             if(this.$route.params.user!=undefined){
                 this.userJson=JSON.parse(this.$route.params.user)
-                console.log(this?.userJson)
+                //console.log(this?.userJson)
             }
         },
         mounted(){},

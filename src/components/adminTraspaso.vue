@@ -22,9 +22,6 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn rounded color="#1C4C96" dark small @click="onClickBuscar">
-              <v-icon dark left>mdi-magnify</v-icon>Buscar</v-btn
-            >
             <v-btn rounded color="#558B2F" dark small @click="onClickLimpiar">
               <v-icon dark left>mdi-monitor-shimmer</v-icon>Limpiar</v-btn
             >
@@ -54,6 +51,7 @@
             :items="traspaso"
             :items-per-page="5"
             class="ml-15 mr-15"
+            :search="buscarTraspaso"
             dense
           >
             <template v-slot:[`item.actions`]="{ item }">
