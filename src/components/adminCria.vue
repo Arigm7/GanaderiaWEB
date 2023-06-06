@@ -63,6 +63,20 @@
         </v-col>
       </v-row>
 
+      <!--TABLA DETALLE-->
+      <v-card-text>
+        <v-card-title>Movimientos de Crias</v-card-title>
+      </v-card-text>
+      <v-row>
+        <v-col cols="12">
+          <v-data-table :headers="headersDetalle" :items="criaDetalle" :items-per-page="5" class="ml-15 mr-15" dense :search="buscarCria">
+            <template v-slot:item.numArete="{item}">
+              <span class="font-weight-bold blue--text">{{ item.numArete }} </span>
+            </template>
+          </v-data-table>
+        </v-col>
+      </v-row>
+
       <!--DIALOGO NUEVO-->
       <v-dialog v-model="dialogNuevo" persistent max-width="500" transition="dialog-transition">
         <v-card>
@@ -234,8 +248,18 @@
           { text: 'Encargado', value: 'usuario' },
           { text: 'Actions', value: 'actions' },
         ],
+        headersDetalle: [
+          { text: 'Número de arete', value: 'numArete' },
+          { text: 'Sexo', value: 'sexo' },
+          { text: 'Fecha de Nacimiento', value: 'fechaNac' },
+          { text: 'Estatus', value: 'estatus' },
+          { text: 'Raza', value: 'raza' },
+          { text: 'Observaciones', value: 'observaciones' },
+          { text: 'Encargado', value: 'usuario' },
+        ],
 
         cria:[],
+        criaDetalle:[],
         sexoItems:["Macho","Hembra"],
         raza:[],
         hato:[],
@@ -263,6 +287,7 @@
       this.getCria();
       this.getHato();
       this.getRaza();
+      this.getCriaDetalle();
       /*Get Data of Cria
       await axios.get("http://localhost:8084/GanaderiaWS/ws/cria/getAllCria/")
       .then(response=>{
@@ -390,6 +415,13 @@
         .then(response=>{
         console.log(response)
         for(let i in response.data){this.cria.push(response.data[i]) }}).catch(e => console.log(e));
+      },
+      async getCriaDetalle(){
+
+        await axios.get("http://localhost:8084/GanaderiaWS/ws/cria/getAllCriaHistorial/")
+        .then(response=>{
+        console.log(response)
+        for(let i in response.data){this.criaDetalle.push(response.data[i]) }}).catch(e => console.log(e));
       },
       async getHato(){
         //Get Data of Hato

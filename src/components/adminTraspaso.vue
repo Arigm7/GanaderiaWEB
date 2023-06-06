@@ -97,11 +97,12 @@
             :items="traspasoDetalle"
             :items-per-page="5"
             class="ml-15 mr-15"
+            :search="buscarTraspaso"
             dense
           >
-            <template v-slot:item.loteOriginal="{ item }">
+            <template v-slot:item.nombreLote="{ item }">
               <span class="font-weight-bold blue--text"
-                >{{ item.loteOriginal }}
+                >{{ item.nombreLote }}
               </span>
             </template>
           </v-data-table>
@@ -401,7 +402,7 @@ export default {
       ],
       headersDetalle: [
         { text: "Número de Arete", value: "numArete" },
-        { text: "Nombre de Lote", value: "loteOriginal" },
+        { text: "Nombre de Lote", value: "nombreLote" },
         { text: "Descripción", value: "descripcion" },
         { text: "Estatus", value: "estatus" },
         { text: "Motivo", value: "motivo" },
@@ -410,7 +411,7 @@ export default {
         { text: "Fecha de Cancelación", value: "fechaCancelacion" },
         { text: "Motivo de Cancelación", value: "motivoDeCancelacion" },
         { text: "Encargado", value: "usuario" },
-        { text: "Actions", value: "actions" },
+        
       ],
       traspasoAttributes: {
         idTraspaso: null,
@@ -438,6 +439,7 @@ export default {
     this.getTraspaso();
     this.getHato();
     this.getLote();
+    this.getMovimientosTraspaso();
   },
   mounted() {},
   computed: {},
@@ -446,6 +448,10 @@ export default {
     onClickBuscar() {},
     onClickLimpiar() {
       this.$refs.formBusqueda.reset();
+      this.traspaso=[],
+      this.traspasoDetalle=[],
+      this.getMovimientosTraspaso(),
+      this.getTraspaso();
     },
     onclickNuevoTraspaso() {
       this.dialogNuevo = true;
@@ -588,7 +594,15 @@ export default {
         .catch((e) => console.log(e));
     },
     async getMovimientosTraspaso(){
-      //Aqui es donde muestra lo del trigger
+      const response = await get("/traspaso/getAllTraspasoHistorial/");
+      if (response.error === true) {
+        console.log(response);
+
+        return;
+      } else {
+        console.log(response);
+        this.traspasoDetalle = response;
+      }
     }
   },
 };

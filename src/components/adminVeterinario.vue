@@ -88,6 +88,29 @@
           </v-data-table>
         </v-col>
       </v-row>
+
+      <!--TABLA DETALLE-->
+      <v-card-text>
+        <v-card-title>Movimientos de Visitas</v-card-title>
+      </v-card-text>
+      <v-row>
+        <v-col cols="12">
+          <v-data-table
+            :headers="headersDetalle"
+            :items="visitaDetalle"
+            :items-per-page="5"
+            class="ml-15 mr-15"
+            :search="buscarVisita"
+            dense
+          >
+            <template v-slot:item.numArete="{ item }">
+              <span class="font-weight-bold blue--text"
+                >{{ item.numArete }}
+              </span>
+            </template>
+          </v-data-table>
+        </v-col>
+      </v-row>
       <!--DIALOGO NUEVO-->
       <v-dialog
         v-model="dialogNuevo"
@@ -327,8 +350,18 @@ export default {
         { text: "Encargado", value: "usuario" },
         { text: "Actions", value: "actions" },
       ],
+      headersDetalle: [
+        { text: "Número de arete", value: "numArete" },
+        { text: "Veterinario", value: "nombreVisita" },
+        { text: "Fecha de la visita", value: "fechaVisita" },
+        { text: "motivo", value: "motivo" },
+        { text: "Observaciones", value: "observaciones" },
+        { text: "Estatus", value: "estatus" },
+        { text: "Encargado", value: "usuario" },
+      ],
 
       visita: [],
+      visitaDetalle:[],
       hato:[],
       required:[(v) => !!v || "Este campo es requerido"], 
     };
@@ -342,6 +375,7 @@ export default {
   created() {
     this.getVisita();
     this.getHato();
+    this.getVisitaDetalle();
     //console.log(this.userJson);
   },
   mounted() {},
@@ -414,6 +448,8 @@ export default {
       this.$refs.formBusqueda.reset();
       this.visita = [];
       this.hato=[],
+      this.visitaDetalle=[];
+      this.getVisitaDetalle();
       this.getVisita();
       this.getHato()
        
@@ -447,6 +483,18 @@ export default {
       } else {
         console.log(response);
         this.visita = response;
+      }
+    },
+    async getVisitaDetalle() {
+
+      const response = await get("/veterinario/getAllVisitaHistorial/");
+      if (response.error === true) {
+        console.log(response);
+
+        return;
+      } else {
+        console.log(response);
+        this.visitaDetalle = response;
       }
     },
     async getHato(){
