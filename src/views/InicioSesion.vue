@@ -1,4 +1,5 @@
-<template>
+<template >
+  <div class="backgruond">
   <v-main class="d-flex justify-center al">
     <v-col cols="10" lg="4" class="mx-auto">
       <v-card class="pa-4">
@@ -7,6 +8,7 @@
             <v-icon size="40" color="indigo">mdi-account-cowboy-hat</v-icon>
           </v-avatar>
           <h2 class="indigo--text">Inicio de Sesión</h2>
+          <h4 class="indigo--text">Administración de Ganaderia </h4>
         </div>
         <v-form ref="formSesion" v-model="valid" lazy-validation>
           <v-card-text>
@@ -37,6 +39,7 @@
       </v-card>
     </v-col>
   </v-main>
+</div>
 </template>
   
 <script>
@@ -110,4 +113,22 @@ export default {
 </script>
   
 <style>
+.backgruond {
+  background-image: url('../assets/img6.jpg') !important;
+    width: 100%;
+    height: 100%;
+    display: block;
+    position: absolute;
+    top:0;
+    background-size: cover;
+    background-color: #e2e1e1;
+  }
+
+.contenedor{
+  position: absolute  !important;
+  
+  top:80% !important;
+  left:38% !important;
+}
+
 </style>

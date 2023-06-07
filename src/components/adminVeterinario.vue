@@ -3,7 +3,7 @@
     <v-card>
       <!--BUSQUEDA-->
       <v-card-text>
-        <v-card-title>Administración de Visitas - Veterinario</v-card-title>
+        <v-card-title class="colorletra">Administración de Visitas - Veterinario</v-card-title>
       </v-card-text>
       <v-row>
         <v-card elevation="24" shaped width="100%" dense class="ml-15 mr-15">
@@ -91,7 +91,7 @@
 
       <!--TABLA DETALLE-->
       <v-card-text>
-        <v-card-title>Movimientos de Visitas</v-card-title>
+        <v-card-title class="colorletra">Movimientos de Visitas</v-card-title>
       </v-card-text>
       <v-row>
         <v-col cols="12">
@@ -119,7 +119,7 @@
         transition="dialog-transition"
       >
         <v-card>
-          <v-card-title>Nueva Visita</v-card-title>
+          <v-card-title class="colorletra">Nueva Visita</v-card-title>
           <v-card-text>
             <v-form ref="formVisitaNuevo" v-model="valid" lazy-validation>
               <v-row align="center" justify="start">
@@ -193,7 +193,7 @@
         transition="dialog-transition"
       >
         <v-card>
-          <v-card-title>Editar Visita</v-card-title>
+          <v-card-title class="colorletra">Editar Visita</v-card-title>
           <v-card-text>
             <v-form ref="formVisitaEdit" v-model="valid" lazy-validation>
               <v-row align="center" justify="start">
@@ -267,7 +267,7 @@
         transition="dialog-transition"
       >
         <v-card>
-          <v-card-title>Eliminar Visita</v-card-title>
+          <v-card-title class="colorletra">Eliminar Visita</v-card-title>
           <v-card-text>¿Seguro que desea desactivar la visita?</v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
@@ -402,7 +402,9 @@ export default {
           this.$refs.formVisitaEdit.reset(),
           this.dialogEditar=false;
           this.visita = [];
+          this.visitaDetalle=[],
           this.getVisita();
+          this.getVisitaDetalle();
           }).catch(rr => console.log(rr));   
         }
     },
@@ -420,7 +422,9 @@ export default {
           this.$refs.formVisitaNuevo.reset(),
           this.dialogNuevo=false;
           this.visita = [];
+          this.visitaDetalle=[],
           this.getVisita();
+          this.getVisitaDetalle();
           }).catch(rr => console.log(rr));   
         }
     },
@@ -430,11 +434,18 @@ export default {
         axios.post("http://localhost:8084/GanaderiaWS/ws/veterinario/eliminarVeterinario/",postData)
           .then(response=>{ 
           console.log(response.data.mensaje);
-          
+          this.$notify({
+            group: 'foo',
+            title: 'Eliminar',
+            text: response.data.mensaje,
+            duration:4000
+          });
           this.dialogEliminar=false;
           this.visita = [];
+          this.visitaDetalle=[],
           this.getVisita();
-      
+          this.getVisitaDetalle();
+            
           
           }).catch(rr => console.log(rr));  
           
@@ -509,4 +520,7 @@ export default {
 };
 </script>
 <style>
+.colorletra{
+    color:rgb(0, 0, 0)
+}
 </style>

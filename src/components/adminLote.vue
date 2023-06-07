@@ -3,7 +3,7 @@
     <v-card>
       <!--BUSQUEDA-->
       <v-card-text>
-        <v-card-title>Administración de Lotes</v-card-title>
+        <v-card-title class="colorletra">Administración de Lotes</v-card-title>
       </v-card-text>
       <v-row>
         <v-card elevation="24" shaped width="100%" dense class="ml-15 mr-15">
@@ -96,7 +96,7 @@
         transition="dialog-transition"
       >
         <v-card>
-          <v-card-title>Nuevo Lote</v-card-title>
+          <v-card-title class="colorletra">Nuevo Lote</v-card-title>
           <v-card-text>
             <v-form ref="formLoteNuevo" v-model="valid" lazy-validation>
               <v-row align="center" justify="start">
@@ -154,7 +154,7 @@
         transition="dialog-transition"
       >
         <v-card>
-          <v-card-title>Editar Lote</v-card-title>
+          <v-card-title class="colorletra">Editar Lote</v-card-title>
           <v-card-text>
             <v-form ref="formLote" v-model="valid" lazy-validation>
               <v-row align="center" justify="start">
@@ -222,7 +222,7 @@
         transition="dialog-transition"
       >
         <v-card>
-          <v-card-title>Eliminar Lote</v-card-title>
+          <v-card-title class="colorletra">Eliminar Lote</v-card-title>
           <v-card-text>¿Seguro que desea desactivar el lote?</v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
@@ -325,20 +325,25 @@ export default {
     },
     async onClickNew() {
       if (this.$refs.formLoteNuevo.validate()) {
-        const postData = new URLSearchParams();
-        postData.append("nombreLote", this.loteAttributes.nombreLote);
-        postData.append("numLote", this.loteAttributes.numLote);
-        postData.append("idUsuario", this.userJson.idUsuario);
-        const response = await post("/lote/registrarLote/", postData);
-        if (response.error === true) {
-          console.log(response.mensaje);
-          return;
-        } else {
-          console.log(response.mensaje);
-          this.$refs.formLoteNuevo.reset(), (this.dialogNuevo = false);
-          this.lote=[];
-          this.getLote()
-        }
+        const responseById = await get("/lote/getLoteById/" + this.loteAttributes.nombreLote);
+          if(responseById.length > 0) {
+            console.log("El lote ya esta registrado");
+          }else{
+            const postData = new URLSearchParams();
+            postData.append("nombreLote", this.loteAttributes.nombreLote);
+            postData.append("numLote", this.loteAttributes.numLote);
+            postData.append("idUsuario", this.userJson.idUsuario);
+            const response = await post("/lote/registrarLote/", postData);
+            if (response.error === true) {
+              console.log(response.mensaje);
+              return;
+            } else {
+              console.log(response.mensaje);
+              this.$refs.formLoteNuevo.reset(), (this.dialogNuevo = false);
+              this.lote=[];
+              this.getLote()
+            }
+          }
       }
     },
     async onClickEdit() {
@@ -393,6 +398,7 @@ export default {
       this.$refs.formBusqueda.reset();
     },
     onclickNuevoLote() {
+      //this.$refs.formLoteNuevo.reset();
       this.dialogNuevo = true;
     },
     cerrarVentanaNuevo() {
@@ -419,4 +425,7 @@ export default {
 };
 </script>
 <style>
+.colorletra{
+    color:rgb(0, 0, 0)
+}
 </style>

@@ -2,6 +2,7 @@
   <v-app>
     <router-view />
     <!--<router-view class="backgruond"/>-->
+    <notifications  group="foo" />
   </v-app>
 </template>
 

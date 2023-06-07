@@ -3,7 +3,7 @@
     <v-card>
       <!--BUSQUEDA-->
       <v-card-text>
-        <v-card-title>Administración de Traspasos</v-card-title>
+        <v-card-title class="colorletra">Administración de Traspasos</v-card-title>
       </v-card-text>
       <v-row>
         <v-card elevation="24" shaped width="100%" dense class="ml-15 mr-15">
@@ -88,7 +88,7 @@
       </v-row>
       <!--TABLA DETALLE-->
       <v-card-text>
-        <v-card-title>Movimientos de Traspasos</v-card-title>
+        <v-card-title class="colorletra">Movimientos de Traspasos</v-card-title>
       </v-card-text>
       <v-row>
         <v-col cols="12">
@@ -116,7 +116,7 @@
         transition="dialog-transition"
       >
         <v-card>
-          <v-card-title>Nuevo Traspaso</v-card-title>
+          <v-card-title class="colorletra">Nuevo Traspaso</v-card-title>
           <v-card-text>
             <v-form ref="formTraspasoNuevo" v-model="valid" lazy-validation>
               <v-row align="center" justify="start">
@@ -195,7 +195,7 @@
         transition="dialog-transition"
       >
         <v-card>
-          <v-card-title>Editar Traspaso</v-card-title>
+          <v-card-title class="colorletra">Editar Traspaso</v-card-title>
           <v-card-text>
             <v-form ref="formTraspasoEdit" v-model="valid" lazy-validation>
               <v-row align="center" justify="start">
@@ -274,7 +274,7 @@
         transition="dialog-transition"
       >
         <v-card>
-          <v-card-title>Eliminar Traspaso</v-card-title>
+          <v-card-title class="colorletra">Eliminar Traspaso</v-card-title>
           <v-card-text>
             <v-form ref="formTraspasoDelet" v-model="valid" lazy-validation>
               <v-row align="center" justify="start">
@@ -325,7 +325,7 @@
         transition="dialog-transition"
       >
         <v-card>
-          <v-card-title>Eliminar Traspaso</v-card-title>
+          <v-card-title class="colorletra">Eliminar Traspaso</v-card-title>
           <v-card-text>¿Seguro que desea desactivar el traspaso?</v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
@@ -465,11 +465,11 @@ export default {
     },
     async onClickNew() {
       if (this.$refs.formTraspasoNuevo.validate()) {
-        /*const response = await get("/traspaso/getTraspasoById/" + this.traspasoAttributes.numArete);
-        if (response.error === true) {
-          console.log(response);
-          console.log("No esta registrado");*/
-          const postData = new URLSearchParams();
+        const response = await get("/traspaso/getTraspasoById/" + this.traspasoAttributes.numArete);
+        if(response.length > 0) {
+          console.log("El hato ya cuenta con un traspaso inicial");
+        }else{
+            const postData = new URLSearchParams();
             postData.append("numArete", this.traspasoAttributes.numArete);
             postData.append("descripcion", this.traspasoAttributes.descripcion);
             postData.append("motivo", this.traspasoAttributes.motivo);
@@ -481,25 +481,19 @@ export default {
               this.$refs.formTraspasoNuevo.reset(),
               this.dialogNuevo=false;
               this.traspaso=[],
+              this.traspasoDetalle=[],
               this.getTraspaso();
+              this.getMovimientosTraspaso();
               
               }).catch(rr => console.log(rr)); 
-          /*return;
-        } else {
-          console.log("Ya esta registrado");
-          console.log(response);
-          this.$refs.formTraspasoNuevo.reset(),
-          this.dialogNuevo=false;
-          this.traspaso=[],
-          this.getTraspaso();
-        }*/
-        console.log(
+        }
+        /*console.log(
           this.traspasoAttributes.numArete,
           this.traspasoAttributes.descripcion,
           this.traspasoAttributes.motivo,
           this.traspasoAttributes.idLote,
           this.userJson.idUsuario
-        );
+        );*/
       }
     },
     onClickEdit(item) {
@@ -508,17 +502,27 @@ export default {
       postData.append("numArete", this.traspasoAttributes.numArete);
       postData.append("descripcion", this.traspasoAttributes.descripcion);
       postData.append("motivo", this.traspasoAttributes.motivo);
-      postData.append("idLote", this.traspasoAttributes.idLote);
       postData.append("idUsuario", this.userJson.idUsuario);
+      postData.append("idLote", this.traspasoAttributes.idLote);
       axios.post("http://localhost:8084/GanaderiaWS/ws/traspaso/actualizarTraspaso/",postData)
       .then(response=>{ 
         console.log(response.data.mensaje);
         this.$refs.formTraspasoEdit.reset(),
         this.dialogEditar=false;
         this.traspaso=[],
+        this.traspasoDetalle=[],
         this.getTraspaso();
+        this.getMovimientosTraspaso();
               
       }).catch(rr => console.log(rr)); 
+      console.log(
+        this.traspasoAttributes.idTraspaso,
+          this.traspasoAttributes.numArete,
+          this.traspasoAttributes.descripcion,
+          this.traspasoAttributes.motivo,
+          this.traspasoAttributes.idLote,
+          this.userJson.idUsuario
+        );
     },
     onClickDelet() {
       const postData = new URLSearchParams();
@@ -531,7 +535,9 @@ export default {
         this.$refs.formTraspasoDelet.reset(),
         this.dialogEliminar=false;
         this.traspaso=[],
+        this.traspasoDetalle=[],
         this.getTraspaso();
+        this.getMovimientosTraspaso();
               
       }).catch(rr => console.log(rr)); 
     },
@@ -609,4 +615,7 @@ export default {
 </script>
       
 <style>
+.colorletra{
+    color:rgb(0, 0, 0)
+}
 </style>

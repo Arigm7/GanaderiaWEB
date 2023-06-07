@@ -3,7 +3,7 @@
     <v-card>
       <!--BUSQUEDA-->
       <v-card-text>
-        <v-card-title>Administración de Cria</v-card-title>
+        <v-card-title class="colorletra">Administración de Cria</v-card-title>
       </v-card-text>
       <v-row>
         <v-card elevation="24" shaped width="100%" dense class="ml-15 mr-15">
@@ -65,7 +65,7 @@
 
       <!--TABLA DETALLE-->
       <v-card-text>
-        <v-card-title>Movimientos de Crias</v-card-title>
+        <v-card-title class="colorletra">Movimientos de Crias</v-card-title>
       </v-card-text>
       <v-row>
         <v-col cols="12">
@@ -80,7 +80,7 @@
       <!--DIALOGO NUEVO-->
       <v-dialog v-model="dialogNuevo" persistent max-width="500" transition="dialog-transition">
         <v-card>
-          <v-card-title>Nueva Cria</v-card-title>
+          <v-card-title  class="colorletra">Nueva Cria</v-card-title>
             <v-card-text>
               <v-form ref="formCriaNuevo" v-model="valid" lazy-validation>
                 <v-row align="center" justify="start">
@@ -125,7 +125,7 @@
       <!--DIALOGO EDITAR-->
       <v-dialog v-model="dialogEditar" persistent max-width="500" transition="dialog-transition">
         <v-card>
-          <v-card-title>Editar Cria</v-card-title>
+          <v-card-title  class="colorletra">Editar Cria</v-card-title>
             <v-card-text>
               <v-form ref="formCriaEditar" v-model="valid" lazy-validation>
                 <v-row align="center" justify="start">
@@ -180,8 +180,8 @@
       <!--DIALOGO ELIMINAR-->
       <v-dialog v-model="dialogEliminar" persistent max-width="1000" transition="dialog-transition">
         <v-card>
-          <v-card-title>Eliminar Cria</v-card-title>
-            <v-card-text>¿Seguro que desea desactivar la cria?</v-card-text>
+          <v-card-title  class="colorletra">Eliminar Cria</v-card-title>
+            <v-card-text  class="colorletra">¿Seguro que desea desactivar la cria?</v-card-text>
             <v-card-actions>
             <v-spacer></v-spacer> 
             <v-btn elevation="0" dark rounded width="120" class="green px13 font-weight-regular pr-4" small @click="onClickDelet()">
@@ -327,9 +327,11 @@
         this.cria = [],
         this.hato=[],
         this.raza=[],
+        this.criaDetalle=[],
         this.getCria(),
         this.getHato(),
-        this.getRaza()
+        this.getRaza(),
+        this.getCriaDetalle()
       },
       onclickNuevoCria(){
         this.dialogNuevo=true
@@ -350,7 +352,9 @@
           this.$refs.formCriaNuevo.reset(),
           this.dialogNuevo=false;
           this.cria = [];
+          this.criaDetalle=[];
           this.getCria();
+          this.getCriaDetalle();
           }).catch(rr => console.log(rr));   
         }
       },
@@ -371,7 +375,9 @@
           this.$refs.formCriaEditar.reset(),
           this.dialogEditar=false;
           this.cria = [];
+          this.criaDetalle=[];
           this.getCria();
+          this.getCriaDetalle();
           }).catch(rr => console.log(rr));   
         }
        
@@ -385,7 +391,9 @@
           
           this.dialogEliminar=false;
           this.cria = [];
+          this.criaDetalle=[];
           this.getCria();
+          this.getCriaDetalle();
       
           
           }).catch(rr => console.log(rr));  
@@ -441,4 +449,7 @@
   };
 </script>
 <style>
+.colorletra{
+    color:rgb(0, 0, 0)
+}
 </style>

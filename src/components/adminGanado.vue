@@ -3,7 +3,7 @@
     <v-card>
       <!--BUSQUEDA-->
       <v-card-text>
-        <v-card-title>Administración de Hato</v-card-title>
+        <v-card-title class="colorletra">Administración de Hato</v-card-title>
       </v-card-text>
       <v-row>
         <v-card elevation="24" shaped width="100%" dense class="ml-15 mr-15">
@@ -65,7 +65,7 @@
       <!--DIALOGO NUEVO-->
       <v-dialog v-model="dialogNuevo" persistent max-width="1000" transition="dialog-transition">
         <v-card>
-          <v-card-title>Nuevo Hato</v-card-title>
+          <v-card-title class="colorletra">Nuevo Hato</v-card-title>
           <v-card-text>
             <v-form ref="formGanadoNuevo" v-model="valid" lazy-validation>
               <v-row align="center" justify="start">
@@ -119,7 +119,7 @@
       <!--DIALOGO EDITAR-->
       <v-dialog v-model="dialogEditar" persistent max-width="1000" transition="dialog-transition">
         <v-card>
-          <v-card-title>Editar Ganado</v-card-title>
+          <v-card-title class="colorletra">Editar Ganado</v-card-title>
           <v-card-text>
             <v-form ref="formGanado" v-model="valid" lazy-validation>
               <v-row align="center" justify="start">
@@ -169,7 +169,7 @@
       <!--DIALOGO ELIMINAR-->
       <v-dialog v-model="dialogEliminar" persistent max-width="1000" transition="dialog-transition">
         <v-card>
-          <v-card-title>Ganado</v-card-title>
+          <v-card-title class="colorletra">Eliminar Ganado</v-card-title>
           <v-card-text>
             <v-form ref="formGanadoEliminar" v-model="validEliminar" lazy-validation>
               <v-row align="center" justify="start">
@@ -195,15 +195,15 @@
       </v-dialog>
       <!--FIN DIALOGO ELIMINAR-->
       <!--CRIA Y VETERINARIO-->
-      <v-tabs v-model="tab" class="tabs" fixed-tabs bg-color="indigo-darken-2">
+      <v-tabs v-model="tab" class="tabs" fixed-tabs bg-color="indigo-darken-2"  slider-color="#176A9F" active-class="active">
         <v-tab href="#cria">
-            <span>Administración de Cria</span> 
+            <span class="colorestania2">Administración de Cria</span> 
         </v-tab>
         <v-tab-item value="cria">
             <adminCria :userJson="userJson"></adminCria>
         </v-tab-item>
         <v-tab href="#visita">
-            <span >Administración de Visitas</span>  
+            <span class="colorestania2">Administración de Visitas</span>  
         </v-tab>
         <v-tab-item value="visita">
             <adminVeterinario :userJson="userJson"></adminVeterinario>
@@ -218,6 +218,9 @@
   import axios, { Axios } from 'axios' 
   import adminCria from '@/components/adminCria.vue'
   import adminVeterinario from '@/components/adminVeterinario.vue'  
+  import { get, post } from "../api/Requests.js";
+
+
   const config = {
     headers: {
       'Content-type': 'application/json; charset=utf-8',
@@ -331,8 +334,13 @@
         this.ganadoAttributes={...item}
         //console.log(this.ganadoAttributes)
       },
-      onClickNew(){
+      async onClickNew(){
         if(this.$refs.formGanadoNuevo.validate()){
+          const response = await get("/hato/getHatoById/" + this.ganadoAttributes.numArete);
+          if(response.length > 0) {
+            console.log("El arete ya esta registrado");
+          }else{
+          
           const postData = new URLSearchParams();
             postData.append('numArete', this.ganadoAttributes.numArete);
             postData.append('sexo', this.ganadoAttributes.sexo);
@@ -353,15 +361,16 @@
 
             })
             .catch(rr => console.log(rr));
+          }
         }
-        console.log(this.ganadoAttributes.numArete)
+        /*console.log(this.ganadoAttributes.numArete)
             console.log(this.ganadoAttributes.sexo)
             console.log(this.ganadoAttributes.descripcion)
             console.log( this.ganadoAttributes.tipoGanado)
             console.log( this.userJson.idUsuario)
             console.log(this.ganadoAttributes.raza)
             console.log(this.ganadoAttributes.idLote)
-            console.log(this.ganadoAttributes.rancho)
+            console.log(this.ganadoAttributes.rancho)*/
         
       },      
       onClickEdit(){
@@ -388,14 +397,14 @@
 
             })
             .catch(rr => console.log(rr));
-            console.log(this.ganadoAttributes.numArete)
+            /*console.log(this.ganadoAttributes.numArete)
             console.log(this.ganadoAttributes.sexo)
             console.log(this.ganadoAttributes.descripcion)
             console.log( this.ganadoAttributes.tipoGanado)
             console.log(this.ganadoAttributes.idRaza)
             console.log(this.ganadoAttributes.idLote)
             console.log(this.ganadoAttributes.idRancho)
-            console.log(this.ganadoAttributes.estatus)
+            console.log(this.ganadoAttributes.estatus)*/
       
 
 
@@ -477,4 +486,15 @@
   };
 </script>
 <style>
+.active{
+    background-color: rgb(100, 151, 185);
+    color: black;
+}
+
+.colorestania2{
+    color:rgb(0, 0, 0)
+}
+.colorletra{
+    color:rgb(0, 0, 0)
+}
 </style>

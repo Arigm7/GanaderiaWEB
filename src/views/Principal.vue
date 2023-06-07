@@ -1,8 +1,8 @@
 <template>
     <div name="root">
-        <v-tabs v-model="tab" class="tabs" fixed-tabs bg-color="indigo-darken-2">
+        <v-tabs v-model="tab" class="tabs" fixed-tabs bg-color="indigo-darken-2" background-color="#1C4C96" slider-color="#1C4C96" active-class="active">
         <v-tab href="#ganado">
-            <span >Administración de Hato</span> 
+            <span class="colorestania"  active-class="active">Administración de Hato</span> 
         </v-tab>
         <v-tab-item value="ganado">
             <adminGanado :userJson="userJson"></adminGanado>
@@ -16,14 +16,14 @@
         </v-tab-item>-->
 
         <v-tab href="#lote">
-            <span >Administración de Lote</span>  
+            <span  class="colorestania" >Administración de Lote</span>  
         </v-tab>
         <v-tab-item value="lote">
             <adminLote :userJson="userJson"></adminLote>
         </v-tab-item>
 
         <v-tab href="#traspaso">
-            <span >Administración de Traspaso</span>  
+            <span class="colorestania" >Administración de Traspaso</span>  
         </v-tab>
         <v-tab-item value="traspaso">
             <adminTraspaso :userJson="userJson"></adminTraspaso>
@@ -79,4 +79,13 @@
       
 <style>
 
+
+.active{
+    background-color: rgb(100, 151, 185);
+    color: black;
+}
+
+.colorestania{
+    color:rgb(255, 255, 255)
+}
 </style>
