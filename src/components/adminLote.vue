@@ -327,7 +327,12 @@ export default {
       if (this.$refs.formLoteNuevo.validate()) {
         const responseById = await get("/lote/getLoteById/" + this.loteAttributes.nombreLote);
           if(responseById.length > 0) {
-            console.log("El lote ya esta registrado");
+            this.$notify({
+                group: 'foo',
+                title: 'Registro',
+                text: 'El lote ya esta registrado',
+                duration:6000
+              });
           }else{
             const postData = new URLSearchParams();
             postData.append("nombreLote", this.loteAttributes.nombreLote);
@@ -336,9 +341,21 @@ export default {
             const response = await post("/lote/registrarLote/", postData);
             if (response.error === true) {
               console.log(response.mensaje);
+              this.$notify({
+                group: 'foo',
+                title: 'Error Registro',
+                text: response.mensaje,
+                duration:6000
+              });
               return;
             } else {
               console.log(response.mensaje);
+              this.$notify({
+                group: 'foo',
+                title: 'Registro',
+                text: response.mensaje,
+                duration:6000
+              });
               this.$refs.formLoteNuevo.reset(), (this.dialogNuevo = false);
               this.lote=[];
               this.getLote()
@@ -357,9 +374,21 @@ export default {
         const response = await post("/lote/actualizarLote/", postData);
         if (response.error === true) {
           console.log(response.mensaje);
+          this.$notify({
+            group: 'foo',
+            title: 'Error Editar',
+            text: response.mensaje,
+            duration:6000
+          });
           return;
         } else {
           console.log(response.mensaje);
+          this.$notify({
+            group: 'foo',
+            title: 'Editar',
+            text: response.mensaje,
+            duration:6000
+          });
           this.$refs.formLote.reset(), (this.dialogEditar = false);
           this.lote=[];
           this.getLote()
@@ -372,9 +401,21 @@ export default {
       const response = await post("/lote/eliminarLote/", postData);
       if (response.error === true) {
         console.log(response.mensaje);
+        this.$notify({
+          group: 'foo',
+          title: 'Error Eliminar',
+          text: response.mensaje,
+          duration:6000
+        });
         return;
       } else {
         console.log(response.mensaje);
+        this.$notify({
+          group: 'foo',
+          title: 'Eliminar',
+          text: response.mensaje,
+          duration:6000
+        });
         this.dialogEliminar = false;
         this.lote=[];
         this.getLote()

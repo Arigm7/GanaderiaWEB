@@ -74,6 +74,12 @@ export default {
       //this.loader = false;
       if (response.error === true) {
         //console.log(response);
+        this.$notify({
+            group: 'foo',
+            title: 'Error',
+            text: response.mensaje,
+            duration:6000
+          });
         return;
       } else {
        // console.log(response);

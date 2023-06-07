@@ -465,9 +465,14 @@ export default {
     },
     async onClickNew() {
       if (this.$refs.formTraspasoNuevo.validate()) {
-        const response = await get("/traspaso/getTraspasoById/" + this.traspasoAttributes.numArete);
-        if(response.length > 0) {
-          console.log("El hato ya cuenta con un traspaso inicial");
+        const responseC = await get("/traspaso/getTraspasoById/" + this.traspasoAttributes.numArete);
+        if(responseC.length > 0) {
+          this.$notify({
+                group: 'foo',
+                title: 'Registro',
+                text: 'El hato ya cuenta con un traspaso inicial',
+                duration:6000
+          });
         }else{
             const postData = new URLSearchParams();
             postData.append("numArete", this.traspasoAttributes.numArete);
@@ -475,71 +480,103 @@ export default {
             postData.append("motivo", this.traspasoAttributes.motivo);
             postData.append("idLote", this.traspasoAttributes.idLote);
             postData.append("idUsuario", this.userJson.idUsuario);
-            axios.post("http://localhost:8084/GanaderiaWS/ws/traspaso/registrarTraspaso/",postData)
-              .then(response=>{ 
-              console.log(response.data.mensaje);
-              this.$refs.formTraspasoNuevo.reset(),
-              this.dialogNuevo=false;
-              this.traspaso=[],
-              this.traspasoDetalle=[],
-              this.getTraspaso();
-              this.getMovimientosTraspaso();
-              
-              }).catch(rr => console.log(rr)); 
+            const response = await post("/traspaso/registrarTraspaso/", postData);
+        if (response.error === true) {
+          console.log(response.mensaje);
+          this.$notify({
+            group: 'foo',
+            title: 'Error Registrar',
+            text: response.mensaje,
+            duration:6000
+          });
+          return;
+        } else {
+          console.log(response.mensaje);
+          this.$notify({
+            group: 'foo',
+            title: 'Registrar',
+            text: response.mensaje,
+            duration:6000
+          });
+          this.$refs.formTraspasoNuevo.reset(),
+          this.dialogNuevo=false;
+          this.traspaso=[],
+          this.traspasoDetalle=[],
+          this.getTraspaso();
+          this.getMovimientosTraspaso();
+        }  
         }
-        /*console.log(
-          this.traspasoAttributes.numArete,
-          this.traspasoAttributes.descripcion,
-          this.traspasoAttributes.motivo,
-          this.traspasoAttributes.idLote,
-          this.userJson.idUsuario
-        );*/
       }
     },
-    onClickEdit(item) {
-      const postData = new URLSearchParams();
-      postData.append("idTraspaso", this.traspasoAttributes.idTraspaso);
-      postData.append("numArete", this.traspasoAttributes.numArete);
-      postData.append("descripcion", this.traspasoAttributes.descripcion);
-      postData.append("motivo", this.traspasoAttributes.motivo);
-      postData.append("idUsuario", this.userJson.idUsuario);
-      postData.append("idLote", this.traspasoAttributes.idLote);
-      axios.post("http://localhost:8084/GanaderiaWS/ws/traspaso/actualizarTraspaso/",postData)
-      .then(response=>{ 
-        console.log(response.data.mensaje);
-        this.$refs.formTraspasoEdit.reset(),
-        this.dialogEditar=false;
-        this.traspaso=[],
-        this.traspasoDetalle=[],
-        this.getTraspaso();
-        this.getMovimientosTraspaso();
-              
-      }).catch(rr => console.log(rr)); 
-      console.log(
-        this.traspasoAttributes.idTraspaso,
-          this.traspasoAttributes.numArete,
-          this.traspasoAttributes.descripcion,
-          this.traspasoAttributes.motivo,
-          this.traspasoAttributes.idLote,
-          this.userJson.idUsuario
-        );
+    async onClickEdit(item) {
+      if(this.$refs.formTraspasoEdit.validate()){
+        const postData = new URLSearchParams();
+        postData.append("idTraspaso", this.traspasoAttributes.idTraspaso);
+        postData.append("numArete", this.traspasoAttributes.numArete);
+        postData.append("descripcion", this.traspasoAttributes.descripcion);
+        postData.append("motivo", this.traspasoAttributes.motivo);
+        postData.append("idUsuario", this.userJson.idUsuario);
+        postData.append("idLote", this.traspasoAttributes.idLote);
+        const response = await post("/traspaso/actualizarTraspaso/", postData);
+          if (response.error === true) {
+            console.log(response.mensaje);
+            this.$notify({
+              group: 'foo',
+              title: 'Error Editar',
+              text: response.mensaje,
+              duration:6000
+            });
+            return;
+          } else {
+            console.log(response.mensaje);
+            this.$notify({
+              group: 'foo',
+              title: 'Editar',
+              text: response.mensaje,
+              duration:6000
+            });
+            this.$refs.formTraspasoEdit.reset(),
+            this.dialogEditar=false;
+            this.traspaso=[],
+            this.traspasoDetalle=[],
+            this.getTraspaso();
+            this.getMovimientosTraspaso();
+          }  
+      }
     },
-    onClickDelet() {
-      const postData = new URLSearchParams();
-      postData.append("idTraspaso", this.traspasoAttributes.idTraspaso);
-      postData.append("motivoDeCancelacion", this.traspasoAttributes.motivoDeCancelacion);
-      postData.append("idUsuario", this.userJson.idUsuario);
-      axios.post("http://localhost:8084/GanaderiaWS/ws/traspaso/eliminarTraspaso/",postData)
-      .then(response=>{ 
-        console.log(response.data.mensaje);
-        this.$refs.formTraspasoDelet.reset(),
-        this.dialogEliminar=false;
-        this.traspaso=[],
-        this.traspasoDetalle=[],
-        this.getTraspaso();
-        this.getMovimientosTraspaso();
-              
-      }).catch(rr => console.log(rr)); 
+    async onClickDelet() {
+      if(this.$refs.formTraspasoDelet.validate()){
+        const postData = new URLSearchParams();
+        postData.append("idTraspaso", this.traspasoAttributes.idTraspaso);
+        postData.append("numArete",this.traspasoAttributes.numArete);
+        postData.append("motivoDeCancelacion", this.traspasoAttributes.motivoDeCancelacion);
+        postData.append("idUsuario", this.userJson.idUsuario);
+        const response = await post("/traspaso/eliminarTraspaso/", postData);
+        if (response.error === true) {
+          console.log(response.mensaje);
+          this.$notify({
+            group: 'foo',
+            title: 'Error Eliminar',
+            text: response.mensaje,
+            duration:6000
+          });
+          return;
+        } else {
+          console.log(response.mensaje);
+          this.$notify({
+            group: 'foo',
+            title: 'Eliminar',
+            text: response.mensaje,
+            duration:6000
+          });
+          this.$refs.formTraspasoDelet.reset(),
+          this.dialogEliminar=false;
+          this.traspaso=[],
+          this.traspasoDetalle=[],
+          this.getTraspaso();
+          this.getMovimientosTraspaso();
+        }
+      }
     },
     cerrarVentanaNuevo() {
       this.$refs.formTraspasoNuevo.reset();

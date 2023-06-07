@@ -387,7 +387,7 @@ export default {
         (this.visitaAttributes = { ...item })
         //console.log(this.visitaAttributes);
     },
-    onClickEdit() {
+    async onClickEdit() {
       if(this.$refs.formVisitaEdit.validate()){
           const postData = new URLSearchParams();
           postData.append('idVisita', this.visitaAttributes.idVisita);
@@ -396,19 +396,34 @@ export default {
           postData.append('observaciones', this.visitaAttributes.observaciones);
           postData.append('numArete', this.visitaAttributes.numArete);
           postData.append('idUsuario', this.userJson.idUsuario);
-          axios.post("http://localhost:8084/GanaderiaWS/ws/veterinario/actualizarVeterinario/",postData)
-          .then(response=>{ 
-          console.log(response.data.mensaje);
+          const response = await post("/veterinario/actualizarVeterinario/", postData);
+        if (response.error === true) {
+          console.log(response.mensaje);
+          this.$notify({
+            group: 'foo',
+            title: 'Error Editar',
+            text: response.mensaje,
+            duration:6000
+          });
+          return;
+        } else {
+          console.log(response.mensaje);
+          this.$notify({
+            group: 'foo',
+            title: 'Editar',
+            text: response.mensaje,
+            duration:6000
+          });
           this.$refs.formVisitaEdit.reset(),
           this.dialogEditar=false;
           this.visita = [];
           this.visitaDetalle=[],
           this.getVisita();
           this.getVisitaDetalle();
-          }).catch(rr => console.log(rr));   
+        }  
         }
     },
-    onClickNew() {
+    async onClickNew() {
       if(this.$refs.formVisitaNuevo.validate()){
           const postData = new URLSearchParams();
           postData.append('nombreVisita', this.visitaAttributes.nombreVisita);
@@ -416,38 +431,60 @@ export default {
           postData.append('observaciones', this.visitaAttributes.observaciones);
           postData.append('numArete', this.visitaAttributes.numArete);
           postData.append('idUsuario', this.userJson.idUsuario);
-          axios.post("http://localhost:8084/GanaderiaWS/ws/veterinario/registrarVeterinario/",postData)
-          .then(response=>{ 
-          console.log(response.data.mensaje);
+          const response = await post("/veterinario/registrarVeterinario/", postData);
+        if (response.error === true) {
+          console.log(response.mensaje);
+          this.$notify({
+            group: 'foo',
+            title: 'Error Registrar',
+            text: response.mensaje,
+            duration:6000
+          });
+          return;
+        } else {
+          console.log(response.mensaje);
+          this.$notify({
+            group: 'foo',
+            title: 'Registrar',
+            text: response.mensaje,
+            duration:6000
+          });
           this.$refs.formVisitaNuevo.reset(),
           this.dialogNuevo=false;
           this.visita = [];
           this.visitaDetalle=[],
           this.getVisita();
           this.getVisitaDetalle();
-          }).catch(rr => console.log(rr));   
+        }  
         }
     },
-    onClickDelet(){
+    async onClickDelet(){
       const postData = new URLSearchParams();
         postData.append('idVisita', this.visitaAttributes.idVisita);
-        axios.post("http://localhost:8084/GanaderiaWS/ws/veterinario/eliminarVeterinario/",postData)
-          .then(response=>{ 
-          console.log(response.data.mensaje);
+        const response = await post("/veterinario/eliminarVeterinario/", postData);
+        if (response.error === true) {
+          console.log(response.mensaje);
+          this.$notify({
+            group: 'foo',
+            title: 'Error Eliminar',
+            text: response.mensaje,
+            duration:6000
+          });
+          return;
+        } else {
+          console.log(response.mensaje);
           this.$notify({
             group: 'foo',
             title: 'Eliminar',
-            text: response.data.mensaje,
-            duration:4000
+            text: response.mensaje,
+            duration:6000
           });
           this.dialogEliminar=false;
           this.visita = [];
           this.visitaDetalle=[],
           this.getVisita();
           this.getVisitaDetalle();
-            
-          
-          }).catch(rr => console.log(rr));  
+        }
           
     },
     deleteItem(item) {
@@ -522,5 +559,20 @@ export default {
 <style>
 .colorletra{
     color:rgb(0, 0, 0)
+}
+
+.success {
+  background: #68CD86;
+  border-left-color: #42A85F;
+}
+
+.warn {
+  background: #ffb648;
+  border-left-color: #f48a06;
+}
+
+.error {
+  background: #E54D42;
+  border-left-color: #B82E24;
 }
 </style>

@@ -336,9 +336,14 @@
       },
       async onClickNew(){
         if(this.$refs.formGanadoNuevo.validate()){
-          const response = await get("/hato/getHatoById/" + this.ganadoAttributes.numArete);
-          if(response.length > 0) {
-            console.log("El arete ya esta registrado");
+          const responseC = await get("/hato/getHatoById/" + this.ganadoAttributes.numArete);
+          if(responseC.length > 0) {
+            this.$notify({
+                group: 'foo',
+                title: 'Registro',
+                text: 'El arete ya esta registrado',
+                duration:6000
+              });
           }else{
           
           const postData = new URLSearchParams();
@@ -350,31 +355,34 @@
             postData.append('idRaza', this.ganadoAttributes.raza);
             postData.append('idLote', this.ganadoAttributes.idLote);
             postData.append('idRancho', this.ganadoAttributes.rancho);
-            //console.log(postData)
-           axios.post("http://localhost:8084/GanaderiaWS/ws/hato/registrarHato/",postData)
-            .then(response=>{
-            console.log(response.data.mensaje)
-            this.$refs.formGanadoNuevo.reset();
-            this.dialogNuevo=false;
-            this.ganado=[];
-            this.getHato();
-
-            })
-            .catch(rr => console.log(rr));
+            const response = await post("/hato/registrarHato/", postData);
+            if (response.error === true) {
+              console.log(response.mensaje);
+              this.$notify({
+                group: 'foo',
+                title: 'Error Registro',
+                text: response.mensaje,
+                duration:6000
+              });
+              return;
+            } else {
+              console.log(response.mensaje);
+              this.$notify({
+                group: 'foo',
+                title: 'Registro',
+                text: response.mensaje,
+                duration:6000
+              });
+              this.$refs.formGanadoNuevo.reset();
+              this.dialogNuevo=false;
+              this.ganado=[];
+              this.getHato();
+            }
           }
         }
-        /*console.log(this.ganadoAttributes.numArete)
-            console.log(this.ganadoAttributes.sexo)
-            console.log(this.ganadoAttributes.descripcion)
-            console.log( this.ganadoAttributes.tipoGanado)
-            console.log( this.userJson.idUsuario)
-            console.log(this.ganadoAttributes.raza)
-            console.log(this.ganadoAttributes.idLote)
-            console.log(this.ganadoAttributes.rancho)*/
         
       },      
-      onClickEdit(){
-       // console.log(this.ganadoAttributes.raza.id)
+      async onClickEdit(){
         if(this.$refs.formGanado.validate()){
             const postData = new URLSearchParams();
             postData.append('numArete', this.ganadoAttributes.numArete);
@@ -386,52 +394,70 @@
             postData.append('idLote', this.ganadoAttributes.idLote);
             postData.append('idRancho', this.ganadoAttributes.idRancho);
              postData.append('estatus', this.ganadoAttributes.estatus);
-            //console.log(postData)
-            axios.post("http://localhost:8084/GanaderiaWS/ws/hato/actualizarHato/",postData)
-            .then(response=>{
-            console.log(response.data.mensaje)
-            this.$refs.formGanado.reset();
+             const response = await post("/hato/actualizarHato/", postData);
+        if (response.error === true) {
+          this.$notify({
+            group: 'foo',
+            title: 'Error Editar',
+            text: response.mensaje,
+            duration:6000
+          });
+          return;
+        } else {
+          this.$notify({
+            group: 'foo',
+            title: 'Editar',
+            text: response.mensaje,
+            duration:6000
+          });
+          this.$refs.formGanado.reset();
             this.dialogEditar=false;
             this.ganado=[];
             this.getHato();
-
-            })
-            .catch(rr => console.log(rr));
-            /*console.log(this.ganadoAttributes.numArete)
-            console.log(this.ganadoAttributes.sexo)
-            console.log(this.ganadoAttributes.descripcion)
-            console.log( this.ganadoAttributes.tipoGanado)
-            console.log(this.ganadoAttributes.idRaza)
-            console.log(this.ganadoAttributes.idLote)
-            console.log(this.ganadoAttributes.idRancho)
-            console.log(this.ganadoAttributes.estatus)*/
-      
-
-
+        }
+    
         }
 
       },
-      onClickDelet(){
+      async onClickDelet(){
         if(this.$refs.formGanadoEliminar.validate()){
           const postData = new URLSearchParams();
           postData.append('numArete', this.ganadoAttributes.numArete);
           postData.append('motivoDeBaja', this.ganadoAttributes.motivoDeBaja);
           postData.append('idUsuario', this.userJson.idUsuario);
-          axios.post("http://localhost:8084/GanaderiaWS/ws/hato/eliminarHato/",postData)
-            .then(response=>{ 
-            console.log(response.data.mensaje);
-            this.$refs.formGanadoEliminar.reset();
-            this.dialogEliminar=false;
-            this.ganado=[];
-            this.getHato();
-            }).catch(rr => console.log(rr));  
+          const response = await post("/hato/eliminarHato/", postData);
+      if (response.error === true) {
+        console.log(response.mensaje);
+        this.$notify({
+          group: 'foo',
+          title: 'Error Eliminar',
+          text: response.mensaje,
+          duration:6000
+        });
+        return;
+      } else {
+        console.log(response.mensaje);
+        this.$notify({
+          group: 'foo',
+          title: 'Eliminar',
+          text: response.mensaje,
+          duration:6000
+        });
+        this.$refs.formGanadoEliminar.reset();
+        this.dialogEliminar=false;
+        this.ganado=[];
+        this.getHato();
+      }
+  
         }
             
       },
       onClickLimpiar(){
         this.$refs.formBusqueda.reset(),
         this.ganado=[],
-        this.getHato()
+        this.lote=[],
+        this.getHato(),
+        this.getLote()
       },
       cerrarVentanaNuevo(){
         this.dialogNuevo=false,

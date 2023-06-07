@@ -92,11 +92,11 @@
                   </v-col>
                   <v-col cols="12" md="6" sm="4"> 
                     <v-flex >
-                      <v-menu v-model="menu2" :close-on-content-click="false" :nudge-right="40" lazy transition="scale-transition" offset-y full-width min-width="290px">
+                      <v-menu v-model="menu1" :close-on-content-click="false" :nudge-right="40" lazy transition="scale-transition" offset-y full-width min-width="290px">
                         <template v-slot:activator="{ on }">
                           <v-text-field v-model="date" label="Fecha de Nacimiento" readonly v-on="on" :rules="required"></v-text-field>
                         </template>
-                        <v-date-picker v-model="date" @input="menu2 = false"></v-date-picker>
+                        <v-date-picker v-model="date" @input="menu1 = false"></v-date-picker>
                       </v-menu>
                     </v-flex>
                   </v-col> 
@@ -207,7 +207,7 @@
       
 <script>
   import axios from "axios";
-  //import {get, post} from '../api/Requests.js'
+  import {get, post} from '../api/Requests.js'
 
   const config = {
     headers: {
@@ -227,6 +227,7 @@
       return{ 
         estatusItems: ["Activo", "Inactivo"],
         date: new Date().toISOString().substr(0, 10),
+        menu1: false,
         menu2: false,
         dialogNuevo:false,
         dialogEditar:false,
@@ -288,21 +289,6 @@
       this.getHato();
       this.getRaza();
       this.getCriaDetalle();
-      /*Get Data of Cria
-      await axios.get("http://localhost:8084/GanaderiaWS/ws/cria/getAllCria/")
-      .then(response=>{
-      console.log(response)
-      for(let i in response.data){this.cria.push(response.data[i]) }}).catch(e => console.log(e));
-      //Get Data of Hato
-      await axios.get("http://localhost:8084/GanaderiaWS/ws/hato/getAllHatoActivo/")
-      .then(response=>{
-      console.log(response)
-      for(let i in response.data){this.hato.push({numArete:response.data[i]["numArete"],id:response.data[i]["numArete"]}) }}).catch(e => console.log(e));
-      // Get Raza
-      await axios.get("http://localhost:8084/GanaderiaWS/ws/raza/getAllRazaActivo")
-      .then(response=>{
-      for(let i in response.data){this.raza.push({nombre:response.data[i]["nombre"],id:response.data[i]["idRaza"]}) }}).catch(e => console.log(e));
-      console.log(this.userJson.idUsuario)*/
       
     },
     mounted(){},
@@ -336,7 +322,7 @@
       onclickNuevoCria(){
         this.dialogNuevo=true
       },
-      onClickNew(){
+      async onClickNew(){
         
         if(this.$refs.formCriaNuevo.validate()){
           const postData = new URLSearchParams();
@@ -346,19 +332,34 @@
           postData.append('idRaza', this.criaAttributes.idRaza);
           postData.append('observaciones', this.criaAttributes.observaciones);
           postData.append('idUsuario', this.userJson.idUsuario);
-          axios.post("http://localhost:8084/GanaderiaWS/ws/cria/registrarCria/",postData)
-          .then(response=>{ 
-          console.log(response.data.mensaje);
-          this.$refs.formCriaNuevo.reset(),
-          this.dialogNuevo=false;
-          this.cria = [];
-          this.criaDetalle=[];
-          this.getCria();
-          this.getCriaDetalle();
-          }).catch(rr => console.log(rr));   
+          const response = await post("/cria/registrarCria/", postData);
+            if (response.error === true) {
+              console.log(response.mensaje);
+              this.$notify({
+                group: 'foo',
+                title: 'Error Registro',
+                text: response.mensaje,
+                duration:6000
+              });
+              return;
+            } else {
+              console.log(response.mensaje);
+              this.$notify({
+                group: 'foo',
+                title: 'Registro',
+                text: response.mensaje,
+                duration:6000
+              });
+              this.$refs.formCriaNuevo.reset(),
+              this.dialogNuevo=false;
+              this.cria = [];
+              this.criaDetalle=[];
+              this.getCria();
+              this.getCriaDetalle();
+            }  
         }
       },
-      onClickEdit(item){
+      async onClickEdit(item){
         if(this.$refs.formCriaEditar.validate()){
           const postData = new URLSearchParams();
           postData.append('idCria', this.criaAttributes.idCria);
@@ -369,35 +370,59 @@
           postData.append('observaciones', this.criaAttributes.observaciones);
           postData.append('idUsuario', this.userJson.idUsuario);
           postData.append('estatus', this.criaAttributes.estatus);
-          axios.post("http://localhost:8084/GanaderiaWS/ws/cria/actualizarCria/",postData)
-          .then(response=>{ 
-          console.log(response.data.mensaje);
+          const response = await post("/cria/actualizarCria/", postData);
+        if (response.error === true) {
+          this.$notify({
+            group: 'foo',
+            title: 'Error Editar',
+            text: response.mensaje,
+            duration:6000
+          });
+          return;
+        } else {
+          this.$notify({
+            group: 'foo',
+            title: 'Editar',
+            text: response.mensaje,
+            duration:6000
+          });
           this.$refs.formCriaEditar.reset(),
           this.dialogEditar=false;
           this.cria = [];
           this.criaDetalle=[];
           this.getCria();
           this.getCriaDetalle();
-          }).catch(rr => console.log(rr));   
+        } 
         }
        
       },
-      onClickDelet(){
+      async onClickDelet(){
         const postData = new URLSearchParams();
         postData.append('idCria', this.criaAttributes.idCria);
-        axios.post("http://localhost:8084/GanaderiaWS/ws/cria/eliminarCria/",postData)
-          .then(response=>{ 
-          console.log(response.data.mensaje);
-          
+        const response = await post("/cria/eliminarCria/", postData);
+      if (response.error === true) {
+        console.log(response.mensaje);
+        this.$notify({
+          group: 'foo',
+          title: 'Error Eliminar',
+          text: response.mensaje,
+          duration:6000
+        });
+        return;
+      } else {
+        console.log(response.mensaje);
+        this.$notify({
+          group: 'foo',
+          title: 'Eliminar',
+          text: response.mensaje,
+          duration:6000
+        });
           this.dialogEliminar=false;
           this.cria = [];
           this.criaDetalle=[];
           this.getCria();
           this.getCriaDetalle();
-      
-          
-          }).catch(rr => console.log(rr));  
-          console.log(this.criaAttributes.idCria);
+      }
       },
       cerrarVentanaNuevo(){
         this.$refs.formCriaNuevo.reset(),
